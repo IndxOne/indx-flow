@@ -354,67 +354,118 @@ const getModeLabel = (mode) => {
   return labels[mode] || mode
 }
 
-const generateWorkspace = () => {
-  // Enrichir les données avec informations complètes d'analyse
-  const workspaceData = {
-    // Informations de base du projet
-    projectName: formStore.userInfo.projectName || 
-                formStore.userInfo.businessSector || 
-                'Nouveau Projet',
+const generateWorkspace = async () => {
+  try {
+    // 1. Sauvegarder l'analyse dans Supabase
+    console.log('💾 [WORKSPACE] Sauvegarde de l\'analyse dans Supabase...')
+    const analysisResult = await formStore.saveAnalysisToSupabase()
     
-    // Contextes détectés avec détails complets
-    detectedContext: formStore.detectedContext,
-    detectedContexts: formStore.detectedContexts || [],
-    primaryContextData: formStore.fullAnalysisResult?.analysis?.detectedContexts?.find(c => c.priority === 'primary'),
-    
-    // Structure et configuration
-    structure: formStore.structurePreview || [],
-    confidence: formStore.confidence,
-    isHybrid: formStore.isHybrid,
-    secondaryType: formStore.secondaryType,
-    
-    // Réponses adaptatives pour personnalisation
-    adaptiveAnswers: formStore.adaptiveAnswers || {},
-    
-    // Données utilisateur complètes
-    userInfo: {
-      ...formStore.userInfo,
-      businessSector: formStore.userInfo.businessSector,
-      email: formStore.userInfo.email,
-      newsletter: formStore.userInfo.newsletter
-    },
-    
-    // Résultat d'analyse complet pour référence future
-    analysisResult: formStore.fullAnalysisResult,
-    
-    // Métadonnées
-    detectionMode: formStore.detectionMode,
-    analysisTime: formStore.analysisTime,
-    costTracking: formStore.costTracking,
-    timestamp: new Date().toISOString(),
-    
-    // Configuration workspace intelligente
-    workspaceConfig: {
-      autoGenerateTasks: true,
-      useContextualColumns: true,
-      enableIntelligentSuggestions: true,
-      projectType: determineProjectType(formStore.detectedContext, formStore.detectedContexts),
-      estimatedComplexity: calculateProjectComplexity(formStore.adaptiveAnswers, formStore.confidence)
+    let analysisId = null
+    if (analysisResult.success) {
+      analysisId = analysisResult.analysisId
+      console.log('✅ [WORKSPACE] Analyse sauvegardée avec ID:', analysisId)
+    } else {
+      console.log('📦 [WORKSPACE] Mode local - Supabase non disponible')
     }
+
+    // 2. Enrichir les données avec informations complètes d'analyse
+    const workspaceData = {
+      // ID de l'analyse pour référence
+      analysisId: analysisId,
+      
+      // Informations de base du projet
+      projectName: formStore.userInfo.projectName || 
+                  formStore.userInfo.businessSector || 
+                  'Nouveau Projet',
+      
+      // Contextes détectés avec détails complets
+      detectedContext: formStore.detectedContext,
+      detectedContexts: formStore.detectedContexts || [],
+      primaryContextData: formStore.fullAnalysisResult?.analysis?.detectedContexts?.find(c => c.priority === 'primary'),
+      
+      // Structure et configuration
+      structure: formStore.structurePreview || [],
+      confidence: formStore.confidence,
+      isHybrid: formStore.isHybrid,
+      secondaryType: formStore.secondaryType,
+      
+      // Réponses adaptatives pour personnalisation
+      adaptiveAnswers: formStore.adaptiveAnswers || {},
+      
+      // Données utilisateur complètes
+      userInfo: {
+        ...formStore.userInfo,
+        businessSector: formStore.userInfo.businessSector,
+        email: formStore.userInfo.email,
+        newsletter: formStore.userInfo.newsletter
+      },
+      
+      // Résultat d'analyse complet pour référence future
+      analysisResult: formStore.fullAnalysisResult,
+      
+      // Métadonnées
+      detectionMode: formStore.detectionMode,
+      analysisTime: formStore.analysisTime,
+      costTracking: formStore.costTracking,
+      timestamp: new Date().toISOString(),
+      
+      // Configuration workspace intelligente
+      workspaceConfig: {
+        autoGenerateTasks: true,
+        useContextualColumns: true,
+        enableIntelligentSuggestions: true,
+        projectType: determineProjectType(formStore.detectedContext, formStore.detectedContexts),
+        estimatedComplexity: calculateProjectComplexity(formStore.adaptiveAnswers, formStore.confidence),
+        persistenceEnabled: !!analysisId
+      }
+    }
+
+    // 3. Créer le workspace dans Supabase si possible
+    if (analysisId) {
+      console.log('🏗️ [WORKSPACE] Création du workspace dans Supabase...')
+      const workspaceResult = await formStore.createWorkspaceFromAnalysis(analysisId)
+      
+      if (workspaceResult.success) {
+        workspaceData.workspaceId = workspaceResult.workspaceId
+        workspaceData.supabaseWorkspace = workspaceResult.workspace
+        console.log('✅ [WORKSPACE] Workspace créé avec ID:', workspaceResult.workspaceId)
+      }
+    }
+    
+    // 4. Sauvegarder dans sessionStorage pour transmission à l'espace de travail
+    sessionStorage.setItem('workspaceAnalysis', JSON.stringify(workspaceData))
+    
+    console.log('🚀 [WORKSPACE] Données enrichies sauvegardées:', {
+      projectName: workspaceData.projectName,
+      contexts: workspaceData.detectedContexts?.length || 0,
+      answers: Object.keys(workspaceData.adaptiveAnswers).length,
+      config: workspaceData.workspaceConfig,
+      analysisId: analysisId,
+      workspaceId: workspaceData.workspaceId
+    })
+    
+    // 5. Navigation vers l'espace de travail
+    window.open('/workspace', '_blank')
+    
+  } catch (error) {
+    console.error('❌ [WORKSPACE] Erreur lors de la génération:', error)
+    
+    // En cas d'erreur, continuer en mode local
+    const fallbackData = {
+      projectName: formStore.userInfo.projectName || 'Nouveau Projet',
+      detectedContext: formStore.detectedContext,
+      structure: formStore.structurePreview || [],
+      userInfo: formStore.userInfo,
+      workspaceConfig: { 
+        projectType: 'GENERIC',
+        persistenceEnabled: false,
+        fallbackMode: true
+      }
+    }
+    
+    sessionStorage.setItem('workspaceAnalysis', JSON.stringify(fallbackData))
+    window.open('/workspace', '_blank')
   }
-  
-  // Sauvegarder dans sessionStorage pour transmission à l'espace de travail
-  sessionStorage.setItem('workspaceAnalysis', JSON.stringify(workspaceData))
-  
-  console.log('🚀 [WORKSPACE] Données enrichies sauvegardées:', {
-    projectName: workspaceData.projectName,
-    contexts: workspaceData.detectedContexts?.length || 0,
-    answers: Object.keys(workspaceData.adaptiveAnswers).length,
-    config: workspaceData.workspaceConfig
-  })
-  
-  // Navigation vers l'espace de travail
-  window.open('/workspace', '_blank')
 }
 
 const determineProjectType = (primaryContext, allContexts) => {
