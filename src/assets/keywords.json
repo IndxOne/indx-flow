@@ -1,0 +1,139 @@
+{
+  "contextKeywords": {
+    "CLIENT_BASED": {
+      "keywords": [
+        { "term": "client", "weight": 4.5, "variants": ["clients", "clientèle"] },
+        { "term": "compte", "weight": 4.0, "variants": ["comptes", "portfolio"] },
+        { "term": "patient", "weight": 4.5, "variants": ["patients", "patientèle"] },
+        { "term": "service", "weight": 3.5, "variants": ["services", "prestation"] },
+        { "term": "consultant", "weight": 4.0, "variants": ["consulting", "conseil"] },
+        { "term": "projets", "weight": 4.2, "variants": ["projet", "mission"] },
+        { "term": "médecin", "weight": 4.2, "variants": ["médical", "clinique"] },
+        { "term": "commercial", "weight": 3.8, "variants": ["vente", "b2b"] },
+        { "term": "cabinet", "weight": 4.0, "variants": ["officine", "pratique"] },
+        { "term": "portefeuille", "weight": 3.5, "variants": ["portfolio"] },
+        { "term": "relation", "weight": 3.0, "variants": ["relationnel", "crm"] }
+      ]
+    },
+    "TEMPORAL": {
+      "keywords": [
+        { "term": "sprint", "weight": 4.8, "variants": ["sprints", "scrum"] },
+        { "term": "cycle", "weight": 4.0, "variants": ["cycles", "cyclique"] },
+        { "term": "planning", "weight": 3.5, "variants": ["planification", "agenda"] },
+        { "term": "agile", "weight": 4.5, "variants": ["agilité", "méthodologie"] },
+        { "term": "itération", "weight": 4.2, "variants": ["itératif", "boucle"] },
+        { "term": "chronologique", "weight": 3.8, "variants": ["temporel", "temps"] },
+        { "term": "développement", "weight": 3.0, "variants": ["dev", "développeur"] },
+        { "term": "marketing", "weight": 2.8, "variants": ["campagne", "promotion"] },
+        { "term": "product", "weight": 3.2, "variants": ["produit", "pm"] },
+        { "term": "roadmap", "weight": 4.0, "variants": ["feuille de route"] },
+        { "term": "semaine", "weight": 4.5, "variants": ["semaines", "hebdomadaire"] },
+        { "term": "mois", "weight": 4.0, "variants": ["mensuel", "mensuellement"] },
+        { "term": "trimestre", "weight": 3.8, "variants": ["trimestriel", "quarterly"] },
+        { "term": "quotidien", "weight": 3.5, "variants": ["journalier", "daily"] }
+      ]
+    },
+    "PHASED": {
+      "keywords": [
+        { "term": "phase", "weight": 4.5, "variants": ["phases", "étape"] },
+        { "term": "étape", "weight": 4.2, "variants": ["étapes", "stade"] },
+        { "term": "migration", "weight": 4.0, "variants": ["migrer", "transition"] },
+        { "term": "construction", "weight": 3.8, "variants": ["btp", "chantier"] },
+        { "term": "conception", "weight": 3.5, "variants": ["design", "création"] },
+        { "term": "réalisation", "weight": 3.2, "variants": ["implémentation", "exécution"] },
+        { "term": "tests", "weight": 3.0, "variants": ["test", "validation"] },
+        { "term": "déploiement", "weight": 3.8, "variants": ["mise en production", "lancement"] },
+        { "term": "certification", "weight": 4.0, "variants": ["certifier", "qualification"] },
+        { "term": "séquentiel", "weight": 4.2, "variants": ["séquence", "succession"] }
+      ]
+    },
+    "VERSIONED": {
+      "keywords": [
+        { "term": "version", "weight": 4.8, "variants": ["versions", "v1", "v2"] },
+        { "term": "release", "weight": 4.5, "variants": ["releases", "livraison"] },
+        { "term": "itération", "weight": 4.0, "variants": ["itératif", "répétition"] },
+        { "term": "amélioration", "weight": 3.5, "variants": ["améliorer", "optimisation"] },
+        { "term": "évolution", "weight": 3.8, "variants": ["évoluer", "progression"] },
+        { "term": "mise à jour", "weight": 4.0, "variants": ["update", "maj"] },
+        { "term": "développeur", "weight": 3.2, "variants": ["dev", "développement"] },
+        { "term": "designer", "weight": 2.8, "variants": ["design", "ui/ux"] },
+        { "term": "git", "weight": 4.2, "variants": ["github", "versioning"] },
+        { "term": "changelog", "weight": 4.0, "variants": ["historique", "modifications"] }
+      ]
+    },
+    "PROCESS_BASED": {
+      "keywords": [
+        { "term": "processus", "weight": 4.5, "variants": ["process", "procédure"] },
+        { "term": "workflow", "weight": 4.2, "variants": ["flux", "étapes"] },
+        { "term": "procédure", "weight": 4.0, "variants": ["protocole", "méthode"] },
+        { "term": "qualification", "weight": 3.8, "variants": ["qualifier", "validation"] },
+        { "term": "proposition", "weight": 3.5, "variants": ["devis", "offre"] },
+        { "term": "signature", "weight": 3.8, "variants": ["signer", "contrat"] },
+        { "term": "vente", "weight": 3.5, "variants": ["commercial", "sales"] },
+        { "term": "recrutement", "weight": 4.0, "variants": ["recruter", "rh"] },
+        { "term": "support", "weight": 3.2, "variants": ["assistance", "helpdesk"] },
+        { "term": "qualité", "weight": 3.5, "variants": ["qc", "contrôle"] },
+        { "term": "pilotage", "weight": 4.2, "variants": ["piloter", "gouvernance"] },
+        { "term": "maintenance", "weight": 4.0, "variants": ["maintenir", "corrective"] },
+        { "term": "contrats", "weight": 3.8, "variants": ["contrat", "contractuel"] },
+        { "term": "gestion", "weight": 3.5, "variants": ["gérer", "management"] }
+      ]
+    },
+    "RESOURCE_BASED": {
+      "keywords": [
+        { "term": "équipe", "weight": 4.5, "variants": ["équipes", "team"] },
+        { "term": "ressource", "weight": 4.2, "variants": ["ressources", "rh"] },
+        { "term": "allocation", "weight": 4.0, "variants": ["allouer", "répartition"] },
+        { "term": "planning", "weight": 3.5, "variants": ["planification", "agenda"] },
+        { "term": "agence", "weight": 3.8, "variants": ["studio", "société"] },
+        { "term": "consulting", "weight": 3.5, "variants": ["consultant", "conseil"] },
+        { "term": "multi-sites", "weight": 4.0, "variants": ["multisites", "plusieurs sites"] },
+        { "term": "designer", "weight": 3.0, "variants": ["design", "graphiste"] },
+        { "term": "développeur", "weight": 3.0, "variants": ["dev", "programmeur"] },
+        { "term": "project manager", "weight": 3.5, "variants": ["pm", "chef de projet"] },
+        { "term": "technicien", "weight": 4.2, "variants": ["tech", "technique"] },
+        { "term": "spécialiste", "weight": 3.8, "variants": ["expert", "expertise"] },
+        { "term": "rôle", "weight": 3.5, "variants": ["rôles", "fonction"] },
+        { "term": "multi-rôles", "weight": 4.0, "variants": ["multi-casquettes", "polyvalent"] }
+      ]
+    }
+  },
+  "structures": {
+    "CLIENT_BASED": {
+      "default": ["Client A", "Client B", "Client C", "Prospects"],
+      "medical": ["Patients Urgents", "Rendez-vous", "Suivi", "Archives"],
+      "consulting": ["Client Principal", "Projet Secondaire", "Prospection", "R&D"],
+      "b2b": ["Grands Comptes", "PME", "Startups", "Leads"]
+    },
+    "TEMPORAL": {
+      "default": ["Sprint 1", "Sprint 2", "Sprint 3", "Backlog"],
+      "marketing": ["Q1 Campagne", "Q2 Campagne", "Q3 Campagne", "Q4 Campagne"],
+      "development": ["Sprint Actuel", "Sprint Suivant", "Bugs", "Features"],
+      "agile": ["To Do", "In Progress", "Review", "Done"]
+    },
+    "PHASED": {
+      "default": ["Conception", "Réalisation", "Tests", "Déploiement"],
+      "construction": ["Études", "Fondations", "Gros Œuvre", "Finitions"],
+      "migration": ["Analyse", "Préparation", "Migration", "Validation"],
+      "certification": ["Documentation", "Tests", "Audit", "Certification"]
+    },
+    "VERSIONED": {
+      "default": ["v1.0.0", "v1.1.0", "v2.0.0", "Backlog"],
+      "software": ["Stable", "Beta", "Alpha", "Ideas"],
+      "design": ["V1 Design", "V2 Iteration", "V3 Final", "Archive"],
+      "product": ["MVP", "V1", "V2", "Vision"]
+    },
+    "PROCESS_BASED": {
+      "default": ["Lead", "Qualification", "Proposition", "Signature"],
+      "sales": ["Prospection", "Contact", "Négociation", "Closing"],
+      "recruitment": ["Candidatures", "Entretiens", "Tests", "Décision"],
+      "support": ["Nouveau", "En Cours", "Attente Client", "Résolu"]
+    },
+    "RESOURCE_BASED": {
+      "default": ["Jean (Designer)", "Marie (Dev)", "Paul (PM)", "Ressources Libres"],
+      "agency": ["Créatifs", "Techniques", "Commerciaux", "Support"],
+      "consulting": ["Consultants Senior", "Consultants Junior", "Expertise", "Formation"],
+      "multisites": ["Site Paris", "Site Lyon", "Site Remote", "Partagé"]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .transition-context {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-primary {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors;
+  }
+  
+  .step-indicator {
+    @apply flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-all duration-200;
+  }
+  
+  .step-indicator.active {
+    @apply bg-indigo-600 text-white;
+  }
+  
+  .step-indicator.completed {
+    @apply bg-green-500 text-white;
+  }
+  
+  .step-indicator.inactive {
+    @apply bg-gray-200 text-gray-500;
+  }
+  
+  .context-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+  
+  .context-badge.client {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+  
+  .context-badge.temporal {
+    @apply bg-amber-100 text-amber-800;
+  }
+  
+  .context-badge.phased {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .context-badge.versioned {
+    @apply bg-purple-100 text-purple-800;
+  }
+  
+  .context-badge.process {
+    @apply bg-rose-100 text-rose-800;
+  }
+  
+  .context-badge.resource {
+    @apply bg-indigo-100 text-indigo-800;
+  }
+}
