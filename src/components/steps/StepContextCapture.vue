@@ -61,23 +61,37 @@
         <!-- Detected Context -->
         <div class="p-4 rounded-lg border-2 transition-all duration-300"
              :class="confidenceColorClass">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-medium text-gray-900">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-900">
               {{ hasMultipleContexts ? 'Contextes détectés' : 'Contexte détecté' }}
             </h3>
-            <div class="flex items-center space-x-2">
-              <span class="context-badge" :class="contextBadgeClass">
+            <div class="flex items-center space-x-3">
+              <span class="context-badge text-sm px-3 py-1.5 font-medium rounded-full" :class="contextBadgeClass">
                 {{ formatContextType(detectionResult.primaryType) }}
               </span>
-              <span class="text-sm font-medium" :class="confidenceTextClass">
-                {{ detectionResult.confidence }}%
-              </span>
+              <div class="text-right">
+                <div class="text-lg font-bold" :class="confidenceTextClass">
+                  {{ Math.min(detectionResult.confidence, 100) }}%
+                </div>
+                <div class="text-xs text-gray-500 mb-1">confiance</div>
+                <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500" 
+                       :class="confidenceBarClass"
+                       :style="{ width: `${Math.min(detectionResult.confidence, 100)}%` }">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
-          <p class="text-sm text-gray-600 mb-3">
-            {{ detectionResult.reasoning }}
-          </p>
+          <div class="mb-4">
+            <p class="text-sm font-medium text-gray-900 mb-1">
+              Type {{ formatContextType(detectionResult.primaryType) }} détecté avec {{ Math.min(detectionResult.confidence, 100) }}% de correspondance
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ detectionResult.reasoning || 'Votre description correspond parfaitement à ce type d\'organisation.' }}
+            </p>
+          </div>
 
           <!-- Multiple Contexts Display -->
           <div v-if="hasMultipleContexts" class="mt-3 space-y-2">
@@ -117,12 +131,62 @@
                 </svg>
                 <span class="text-sm font-medium text-indigo-800">Profil multi-dimensionnel détecté</span>
               </div>
-              <p class="text-xs text-indigo-700">
+              <p class="text-xs text-indigo-700 mb-3">
                 Votre activité combine {{ detectedContextsList.length }} types d'organisation. 
                 La structure générée reflétera cette complexité en privilégiant le contexte principal 
                 <strong>{{ formatContextType(detectionResult.primaryType) }}</strong> 
                 tout en tenant compte des autres dimensions.
               </p>
+
+              <!-- Sliders de pondération pour personnalisation -->
+              <div v-if="showWeightAdjustment" class="mt-3 pt-3 border-t border-indigo-200">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-medium text-indigo-800">🎛️ Ajuster les priorités</span>
+                  <button 
+                    @click="resetWeights"
+                    class="text-xs text-indigo-600 hover:text-indigo-800"
+                  >
+                    Réinitialiser
+                  </button>
+                </div>
+                <div class="space-y-2">
+                  <div v-for="(context, index) in adjustableContexts" 
+                       :key="context.type"
+                       class="flex items-center space-x-2">
+                    <div class="min-w-0 flex-1">
+                      <label class="text-xs text-indigo-700 font-medium">
+                        {{ formatContextType(context.type) }}
+                      </label>
+                      <input 
+                        type="range" 
+                        :value="context.adjustedWeight * 100"
+                        @input="updateContextWeight(index, $event.target.value)"
+                        min="0" 
+                        max="100" 
+                        step="5"
+                        class="w-full h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer slider"
+                        :class="getSliderClass(context.type)"
+                      >
+                    </div>
+                    <span class="text-xs font-medium text-indigo-800 min-w-fit">
+                      {{ Math.round(context.adjustedWeight * 100) }}%
+                    </span>
+                  </div>
+                </div>
+                <p class="text-xs text-indigo-600 mt-2">
+                  💡 Ajustez selon vos priorités. La structure s'adaptera automatiquement.
+                </p>
+              </div>
+
+              <!-- Bouton pour activer/désactiver les sliders -->
+              <div class="mt-2 text-center">
+                <button 
+                  @click="toggleWeightAdjustment"
+                  class="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                >
+                  {{ showWeightAdjustment ? '🔧 Masquer personnalisation' : '🎛️ Personnaliser les priorités' }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -163,14 +227,18 @@
         </div>
 
         <!-- Examples/Tips -->
-        <div v-if="contextExamples" class="p-4 bg-gray-50 rounded-lg">
-          <h4 class="text-sm font-medium text-gray-900 mb-2">
+        <div v-if="contextExamples" class="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+          <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+            <svg class="w-4 h-4 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
             Exemples d'organisation {{ formatContextType(detectionResult.primaryType) }}
           </h4>
-          <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
-            <div v-for="example in contextExamples" :key="example" class="flex items-center">
-              <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2"></span>
-              {{ example }}
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div v-for="example in contextExamples" :key="example" 
+                 class="flex items-center p-2 bg-white rounded-lg shadow-sm border border-gray-200">
+              <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2 flex-shrink-0"></span>
+              <span class="text-xs font-medium text-gray-700">{{ example }}</span>
             </div>
           </div>
         </div>
@@ -188,16 +256,17 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex justify-end pt-4">
+    <div class="flex justify-center pt-6">
       <button
         @click="handleNext"
         :disabled="!canProceed"
-        class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        class="btn-primary-large disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="canProceed ? 'hover:scale-105 hover:shadow-lg' : ''"
       >
-        Continuer
-        <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
+        Continuer
       </button>
     </div>
   </div>
@@ -223,6 +292,11 @@ const detectionResult = ref(formStore.detectedContext ? {
   confidence: formStore.confidence,
   isHybrid: formStore.isHybrid
 } : null)
+
+// État pour les sliders de pondération
+const showWeightAdjustment = ref(false)
+const adjustableContexts = ref([])
+const originalWeights = ref([])
 
 let analysisTimeout = null
 
@@ -278,6 +352,16 @@ const confidenceTextClass = computed(() => {
   if (confidence >= 70) return 'text-blue-700'
   if (confidence >= 50) return 'text-yellow-700'
   return 'text-orange-700'
+})
+
+const confidenceBarClass = computed(() => {
+  if (!detectionResult.value) return 'bg-gray-400'
+  
+  const confidence = detectionResult.value.confidence
+  if (confidence >= 85) return 'bg-green-500'
+  if (confidence >= 70) return 'bg-blue-500'
+  if (confidence >= 50) return 'bg-yellow-500'
+  return 'bg-orange-500'
 })
 
 const contextBadgeClass = computed(() => {
@@ -406,6 +490,96 @@ const getConfidenceClass = (confidence) => {
   return 'text-red-700'
 }
 
+// Méthodes pour les sliders de pondération
+const initializeAdjustableContexts = () => {
+  if (!detectionResult.value?.detectedContexts) return
+  
+  adjustableContexts.value = detectionResult.value.detectedContexts.map(context => ({
+    ...context,
+    adjustedWeight: context.weight || 1.0
+  }))
+  
+  // Sauvegarder les poids originaux pour réinitialisation
+  originalWeights.value = adjustableContexts.value.map(c => c.weight || 1.0)
+}
+
+const toggleWeightAdjustment = () => {
+  showWeightAdjustment.value = !showWeightAdjustment.value
+  
+  if (showWeightAdjustment.value && adjustableContexts.value.length === 0) {
+    initializeAdjustableContexts()
+  }
+}
+
+const updateContextWeight = (index, value) => {
+  if (!adjustableContexts.value[index]) return
+  
+  adjustableContexts.value[index].adjustedWeight = parseFloat(value) / 100
+  
+  // Mettre à jour le store avec les nouveaux poids
+  updateFormStoreWithAdjustedWeights()
+}
+
+const resetWeights = () => {
+  adjustableContexts.value.forEach((context, index) => {
+    context.adjustedWeight = originalWeights.value[index] || 1.0
+  })
+  
+  updateFormStoreWithAdjustedWeights()
+}
+
+const updateFormStoreWithAdjustedWeights = () => {
+  // Mettre à jour le store avec les contextes ajustés
+  const adjustedContexts = adjustableContexts.value.map(context => ({
+    ...context,
+    weight: context.adjustedWeight,
+    // Recalculer la confidence basée sur le nouveau poids
+    confidence: Math.round(context.confidence * (context.adjustedWeight / (context.weight || 1.0)))
+  }))
+  
+  // Trier par poids ajusté (décroissant)
+  adjustedContexts.sort((a, b) => b.adjustedWeight - a.adjustedWeight)
+  
+  // Mettre à jour le contexte principal si nécessaire
+  const newPrimaryType = adjustedContexts[0].type
+  const newPrimaryConfidence = adjustedContexts[0].confidence
+  
+  if (formStore.detectedContext !== newPrimaryType) {
+    formStore.setDetectedContext(
+      newPrimaryType,
+      newPrimaryConfidence,
+      adjustedContexts.length > 1,
+      detectionResult.value.method
+    )
+    
+    // Mettre à jour aussi le résultat affiché
+    detectionResult.value = {
+      ...detectionResult.value,
+      primaryType: newPrimaryType,
+      confidence: newPrimaryConfidence,
+      detectedContexts: adjustedContexts
+    }
+  }
+  
+  // Mettre à jour les contextes dans le store
+  formStore.setFullAnalysisResult({
+    ...detectionResult.value,
+    detectedContexts: adjustedContexts
+  })
+}
+
+const getSliderClass = (contextType) => {
+  const sliderClasses = {
+    CLIENT_BASED: 'slider-emerald',
+    TEMPORAL: 'slider-amber', 
+    PHASED: 'slider-blue',
+    VERSIONED: 'slider-purple',
+    PROCESS_BASED: 'slider-rose',
+    RESOURCE_BASED: 'slider-indigo'
+  }
+  return sliderClasses[contextType] || 'slider-indigo'
+}
+
 const analyzeText = async (text) => {
   console.log('🚀 [COMPONENT] Début analyzeText avec:', {
     textLength: text.length,
@@ -461,6 +635,13 @@ const analyzeText = async (text) => {
         result.analysis.isHybrid,
         result.analysis.method
       )
+      
+      // Réinitialiser les sliders avec les nouveaux contextes
+      if (result.analysis.detectedContexts && result.analysis.detectedContexts.length > 1) {
+        showWeightAdjustment.value = false // Reset l'état d'affichage
+        adjustableContexts.value = [] // Reset pour forcer la réinitialisation
+      }
+      
       formStore.endAnalysis()
     } else {
       console.error('❌ [COMPONENT] Résultat en erreur:', result.error)

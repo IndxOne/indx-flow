@@ -20,12 +20,32 @@
               <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
             </svg>
             
-            <div class="flex items-center space-x-2">
-              <span class="text-2xl">{{ currentProfile.icon }}</span>
-              <h1 class="text-xl font-semibold text-gray-900">
-                {{ currentProfile.label }}
-              </h1>
-            </div>
+            <router-link 
+              :to="`/${profileType}`"
+              class="text-gray-500 hover:text-gray-700 flex items-center space-x-2"
+            >
+              <span class="text-xl">{{ currentProfile.icon }}</span>
+              <span class="text-lg font-medium">{{ currentProfile.label }}</span>
+            </router-link>
+            
+            <!-- Mission breadcrumb si applicable -->
+            <template v-if="currentMission">
+              <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+              
+              <div class="flex items-center space-x-2">
+                <span class="text-xl">{{ currentMission.icon }}</span>
+                <h1 class="text-xl font-semibold text-gray-900">
+                  {{ currentMission.label }}
+                </h1>
+              </div>
+            </template>
+            
+            <!-- Titre profil simple si pas de mission -->
+            <h1 v-else class="text-xl font-semibold text-gray-900 ml-2">
+              Dashboard
+            </h1>
           </div>
           
           <!-- Actions du profil -->
@@ -37,13 +57,13 @@
             
             <!-- Bouton nouveau workspace -->
             <router-link 
-              :to="`/${profileType}/new`"
+              :to="missionId ? `/${profileType}/${missionId}/new` : `/${profileType}/new`"
               class="btn-primary text-sm"
             >
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
-              Nouveau projet
+              {{ currentMission ? `Nouveau ${currentMission.label}` : 'Nouveau projet' }}
             </router-link>
             
             <!-- Menu profil -->
@@ -172,9 +192,18 @@ const showProfileMenu = ref(false)
 
 // Computed
 const profileType = computed(() => route.params.profileType)
+const missionId = computed(() => route.params.missionId)
 
 const currentProfile = computed(() => {
   return profileStore.getProfileById(profileType.value)
+})
+
+const currentMission = computed(() => {
+  if (profileType.value === 'technicien-si' && missionId.value) {
+    const technicienProfile = profileStore.getProfileById('technicien-si')
+    return technicienProfile.missions?.[missionId.value]
+  }
+  return null
 })
 
 const workspaceCount = computed(() => {

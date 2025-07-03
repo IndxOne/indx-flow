@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDX Flow - UX Demo (Version Corrigée)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .example-tag {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .example-tag:hover {
+            background-color: #4f46e5;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <div id="app">
+        
+        <!-- ÉTAPE 1: WELCOME -->
+        <div id="step1" class="step-content">
+            <div class="gradient-bg min-h-screen flex items-center justify-center px-6">
+                <div class="max-w-2xl mx-auto text-center">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+                        <div class="mb-8">
+                            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                                🎯 INDX Flow
+                            </h1>
+                            <p class="text-xl text-gray-600 mb-2">
+                                Organisez votre travail intelligemment
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                L'IA analyse votre activité et crée la structure parfaite pour vous
+                            </p>
+                        </div>
+
+                        <div class="mb-8">
+                            <textarea 
+                                id="userActivity"
+                                placeholder="Décrivez votre activité en quelques mots...&#10;&#10;Ex: 'Je suis consultant IT, je gère des projets pour plusieurs clients avec une équipe technique.'"
+                                class="w-full h-32 p-4 border-2 border-gray-200 rounded-xl resize-none focus:border-indigo-500 focus:outline-none text-gray-700"
+                                maxlength="500"
+                            ></textarea>
+                            <div class="text-right mt-2">
+                                <span class="text-xs text-gray-400" id="charCount">0/500</span>
+                            </div>
+                        </div>
+
+                        <button 
+                            id="analyzeBtn"
+                            onclick="startAnalysis()"
+                            disabled
+                            class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-4 px-8 rounded-xl font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-purple-700 transition-all duration-200"
+                        >
+                            ✨ Créer mon organisation
+                        </button>
+
+                        <div class="mt-8">
+                            <p class="text-sm text-gray-500 mb-4">💡 Exemples d'activités :</p>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('consultant')">
+                                    👔 Consultant IT multi-clients
+                                </span>
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('manager')">
+                                    👥 Manager équipe produit
+                                </span>
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('freelance')">
+                                    💻 Freelance projets web
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2: ANALYSE EN COURS -->
+        <div id="step2" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    
+                    <!-- Animation d'analyse -->
+                    <div class="mb-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-6">
+                            <div id="loadingIcon" class="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                            🔍 Analyse de votre activité...
+                        </h2>
+                        <p id="analysisProgress" class="text-gray-600 text-lg">
+                            Notre IA analyse votre description...
+                        </p>
+                        
+                        <!-- Barre de progression -->
+                        <div class="w-full max-w-md mx-auto bg-gray-200 rounded-full h-2 mt-6">
+                            <div id="progressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2" id="progressText">0%</p>
+                    </div>
+
+                    <!-- Bouton d'urgence pour passer directement -->
+                    <button onclick="showResults()" class="text-sm text-gray-400 hover:text-gray-600 underline">
+                        ⚡ Passer directement aux résultats (debug)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3: RÉSULTATS -->
+        <div id="step3" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-4xl mx-auto">
+                    
+                    <!-- Success Header -->
+                    <div class="text-center mb-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                            ✅ Analyse terminée !
+                        </h2>
+                        <p class="text-gray-600">
+                            Profil détecté : <span class="font-semibold text-indigo-600" id="detectedProfile">Consultant en Systèmes d'Information</span> (87% confiance)
+                        </p>
+                    </div>
+
+                    <!-- Options de structures -->
+                    <div class="grid gap-6 mb-8">
+                        
+                        <!-- Option 1: Recommandée -->
+                        <div class="card-hover bg-white rounded-2xl shadow-lg border-2 border-indigo-200 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 text-sm font-medium">
+                                Recommandé
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-4">
+                                        <span class="text-2xl">🏢</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                            PAR CLIENTS
+                                            <span class="text-sm font-normal text-indigo-600 ml-2">(87% correspondance)</span>
+                                        </h3>
+                                        <p class="text-gray-600 mb-4">
+                                            Idéal pour gérer plusieurs clients simultanément. Chaque client a son espace dédié pour éviter la confusion.
+                                        </p>
+                                        <div class="text-sm text-gray-500 mb-4">
+                                            <strong>Structure :</strong> 🎯 Prospects → 🏢 Client A → 🏭 Client B → 📦 Terminés
+                                        </div>
+                                        <div class="flex space-x-3">
+                                            <button onclick="previewStructure('client')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-medium hover:bg-indigo-200 transition-colors">
+                                                👀 Voir un aperçu
+                                            </button>
+                                            <button onclick="selectStructure('client')" class="bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-600 transition-colors">
+                                                Choisir cette structure
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Alternative -->
+                        <div class="card-hover bg-white rounded-2xl shadow-lg border border-gray-200">
+                            <div class="p-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mr-4">
+                                        <span class="text-2xl">⚡</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                            PAR PROJETS
+                                            <span class="text-sm font-normal text-amber-600 ml-2">(65% correspondance)</span>
+                                        </h3>
+                                        <p class="text-gray-600 mb-4">
+                                            Focus sur les phases de vos projets. Idéal si vous travaillez par cycles avec des livrables précis.
+                                        </p>
+                                        <div class="text-sm text-gray-500 mb-4">
+                                            <strong>Structure :</strong> 🔍 Analyse → ⚙️ Configuration → 🧪 Tests → 🚀 Déploiement
+                                        </div>
+                                        <div class="flex space-x-3">
+                                            <button onclick="previewStructure('project')" class="bg-amber-100 text-amber-700 px-4 py-2 rounded-lg font-medium hover:bg-amber-200 transition-colors">
+                                                👀 Voir un aperçu
+                                            </button>
+                                            <button onclick="selectStructure('project')" class="bg-amber-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-amber-600 transition-colors">
+                                                Choisir cette structure
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="text-center">
+                        <button onclick="goToStep(1)" class="text-gray-500 hover:text-gray-700 transition-colors">
+                            ← Modifier ma description
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4: APERÇU -->
+        <div id="step4" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-7xl mx-auto">
+                    
+                    <!-- Header -->
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                            <span id="previewIcon">🏢</span> Aperçu : <span id="previewTitle">Organisation par Clients</span>
+                        </h2>
+                        <p class="text-gray-600">
+                            Voici comment votre espace sera organisé
+                        </p>
+                    </div>
+
+                    <!-- Kanban Preview -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="kanbanPreview">
+                            <!-- Généré dynamiquement -->
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="goToStep(3)" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors">
+                            ← Retour aux options
+                        </button>
+                        <button onclick="createWorkspace()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">
+                            ✨ Créer mon espace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 5: SUCCÈS -->
+        <div id="step5" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    
+                    <div class="mb-8">
+                        <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6">
+                            <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                            🎉 Votre espace est prêt !
+                        </h2>
+                        <p class="text-xl text-gray-600 mb-8">
+                            Félicitations ! Votre organisation personnalisée a été créée avec succès.
+                        </p>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="window.alert('Redirection vers votre espace !')" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">
+                            🚀 Accéder à mon espace
+                        </button>
+                        <button onclick="goToStep(1)" class="bg-white border-2 border-gray-300 text-gray-700 px-6 py-4 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                            ➕ Créer un autre espace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // État global
+        let analysisTimer = null;
+        let progressInterval = null;
+
+        // Exemples
+        const examples = {
+            consultant: "Je suis consultant IT spécialisé en transformation digitale. Je gère simultanément 3-4 projets clients avec des équipes techniques mixtes. Entre les phases d'analyse, de configuration système et le support utilisateur, j'ai besoin d'une organisation claire par client.",
+            manager: "Je manage une équipe produit de 8 personnes sur plusieurs fonctionnalités. Nous travaillons en cycles de 2 semaines avec des sprints définis. Je dois coordonner le développement, les tests et les déploiements.",
+            freelance: "Développeur web freelance, je jongle entre plusieurs projets clients simultanément. Sites e-commerce, applications mobiles, maintenance... Chaque projet a ses propres échéances."
+        };
+
+        // Structures
+        const structures = {
+            client: {
+                title: 'Organisation par Clients',
+                icon: '🏢',
+                columns: [
+                    { name: '🎯 Prospects', tasks: ['Lead Banque ABC', 'Contact Startup Tech', 'RDV PME Locale'] },
+                    { name: '🏢 Client Alpha', tasks: ['Audit SI complet', 'Roadmap Digital', 'Formation équipe'] },
+                    { name: '🏭 Client Beta', tasks: ['Migration ERP', 'Tests utilisateur', 'Go-Live'] },
+                    { name: '📦 Terminés', tasks: ['Projet Gamma', 'Support Delta'] }
+                ]
+            },
+            project: {
+                title: 'Organisation par Projets',
+                icon: '⚡',
+                columns: [
+                    { name: '🔍 Analyse', tasks: ['Recueil besoins', 'Audit technique', 'Architecture'] },
+                    { name: '⚙️ Configuration', tasks: ['Setup environnement', 'Paramétrage', 'Dev connecteurs'] },
+                    { name: '🧪 Tests', tasks: ['Tests unitaires', 'Tests intégration', 'UAT Client'] },
+                    { name: '🚀 Déploiement', tasks: ['Mise en prod', 'Formation', 'Documentation'] }
+                ]
+            }
+        };
+
+        // Navigation
+        function goToStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+        }
+
+        // Gestion du textarea
+        document.getElementById('userActivity').addEventListener('input', function() {
+            const text = this.value;
+            const charCount = text.length;
+            const btn = document.getElementById('analyzeBtn');
+            
+            document.getElementById('charCount').textContent = `${charCount}/500`;
+            btn.disabled = charCount < 10;
+        });
+
+        // Exemples
+        function setExample(type) {
+            const textarea = document.getElementById('userActivity');
+            textarea.value = examples[type];
+            textarea.dispatchEvent(new Event('input'));
+        }
+
+        // Analyse simplifiée et GARANTIE de fonctionner
+        function startAnalysis() {
+            console.log('🚀 Démarrage analyse...');
+            goToStep(2);
+            
+            // Nettoyage des timers précédents
+            if (analysisTimer) clearTimeout(analysisTimer);
+            if (progressInterval) clearInterval(progressInterval);
+            
+            // Animation de progression
+            let progress = 0;
+            const messages = [
+                'Analyse des mots-clés...',
+                'Détection du contexte métier...',
+                'Génération des recommandations...',
+                'Optimisation des structures...',
+                'Finalisation...'
+            ];
+            
+            progressInterval = setInterval(() => {
+                progress += 2;
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressText').textContent = progress + '%';
+                
+                const messageIndex = Math.floor(progress / 20);
+                if (messages[messageIndex]) {
+                    document.getElementById('analysisProgress').textContent = messages[messageIndex];
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    // FORCE l'affichage des résultats après 100%
+                    setTimeout(showResults, 500);
+                }
+            }, 50); // 50ms * 2% = 2.5 secondes total
+        }
+
+        // Fonction GARANTIE pour afficher les résultats
+        function showResults() {
+            console.log('✅ Affichage des résultats...');
+            
+            // Nettoyage complet
+            if (analysisTimer) clearTimeout(analysisTimer);
+            if (progressInterval) clearInterval(progressInterval);
+            
+            // Passage forcé à l'étape 3
+            goToStep(3);
+        }
+
+        // Aperçu structure
+        function previewStructure(type) {
+            const structure = structures[type];
+            document.getElementById('previewTitle').textContent = structure.title;
+            document.getElementById('previewIcon').textContent = structure.icon;
+            
+            const kanban = document.getElementById('kanbanPreview');
+            kanban.innerHTML = structure.columns.map(column => `
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <h3 class="font-bold text-gray-900 mb-3">${column.name}</h3>
+                    <div class="space-y-2">
+                        ${column.tasks.map(task => `
+                            <div class="bg-white rounded-lg p-3 shadow-sm border">
+                                <p class="text-sm text-gray-700">${task}</p>
+                            </div>
+                        `).join('')}
+                        <button class="w-full bg-gray-100 text-gray-500 rounded-lg p-2 text-sm hover:bg-gray-200 transition-colors">
+                            + Nouvelle tâche
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            goToStep(4);
+        }
+
+        function selectStructure(type) {
+            previewStructure(type);
+        }
+
+        function createWorkspace() {
+            goToStep(5);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Demo initialisé');
+        });
+    </script>
+</body>
+</html>

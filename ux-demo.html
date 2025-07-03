@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDX Flow - Nouvelle UX Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .example-tag {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .example-tag:hover {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .kanban-card {
+            min-height: 60px;
+        }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .step-completed {
+            background-color: #10b981;
+            color: white;
+        }
+        .step-pending {
+            background-color: #e5e7eb;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Navigation Étapes -->
+    <div class="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="step-indicator step-active rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1</div>
+                    <span class="text-sm font-medium">Décrivez votre activité</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="step-indicator step-pending rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">2</div>
+                    <span class="text-sm text-gray-500">Analyse & Suggestions</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="step-indicator step-pending rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">3</div>
+                    <span class="text-sm text-gray-500">Aperçu</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="step-indicator step-pending rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">4</div>
+                    <span class="text-sm text-gray-500">Votre espace</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu Principal -->
+    <div id="app" class="min-h-screen">
+        
+        <!-- ÉTAPE 1: WELCOME -->
+        <div id="step1" class="step-content">
+            <div class="gradient-bg min-h-screen flex items-center justify-center px-6">
+                <div class="max-w-2xl mx-auto text-center">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+                        <div class="mb-8">
+                            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                                🎯 INDX Flow
+                            </h1>
+                            <p class="text-xl text-gray-600 mb-2">
+                                Organisez votre travail intelligemment
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                L'IA analyse votre activité et crée la structure parfaite pour vous
+                            </p>
+                        </div>
+
+                        <div class="mb-8">
+                            <textarea 
+                                id="userActivity"
+                                placeholder="Décrivez votre activité en quelques mots...&#10;&#10;Ex: 'Je suis consultant IT, je gère des projets pour plusieurs clients avec une équipe technique. Je dois jongler entre maintenance, nouveaux projets et support utilisateur.'"
+                                class="w-full h-32 p-4 border-2 border-gray-200 rounded-xl resize-none focus:border-indigo-500 focus:outline-none text-gray-700"
+                                maxlength="500"
+                            ></textarea>
+                            <div class="text-right mt-2">
+                                <span class="text-xs text-gray-400" id="charCount">0/500</span>
+                            </div>
+                        </div>
+
+                        <button 
+                            id="analyzeBtn"
+                            onclick="goToStep2()"
+                            disabled
+                            class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-4 px-8 rounded-xl font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-purple-700 transition-all duration-200"
+                        >
+                            ✨ Créer mon organisation
+                        </button>
+
+                        <div class="mt-8">
+                            <p class="text-sm text-gray-500 mb-4">💡 Exemples d'activités :</p>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('consultant')">
+                                    👔 Consultant IT multi-clients
+                                </span>
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('manager')">
+                                    👥 Manager équipe produit
+                                </span>
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('freelance')">
+                                    💻 Freelance projets web
+                                </span>
+                                <span class="example-tag bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm" onclick="setExample('startup')">
+                                    🚀 Fondateur startup
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2: ANALYSE & SUGGESTIONS -->
+        <div id="step2" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-4xl mx-auto">
+                    
+                    <!-- Header Analyse -->
+                    <div class="text-center mb-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
+                            <svg class="w-8 h-8 text-indigo-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                            🔍 Analyse de votre activité...
+                        </h2>
+                        <p class="text-gray-600" id="analysisText">
+                            Notre IA analyse votre description pour identifier le meilleur type d'organisation...
+                        </p>
+                    </div>
+
+                    <!-- Résultat Analyse -->
+                    <div id="analysisResult" class="hidden">
+                        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                            <div class="flex items-center mb-6">
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">Profil détecté :</h3>
+                                    <p class="text-lg text-indigo-600 font-semibold" id="detectedProfile">👔 Consultant en Systèmes d'Information</p>
+                                    <p class="text-sm text-gray-500">Confiance : <span class="font-medium text-green-600">87%</span></p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-600 mb-6">
+                                📊 Nous avons identifié <strong>3 façons d'organiser</strong> votre travail. Choisissez celle qui vous convient le mieux :
+                            </p>
+                        </div>
+
+                        <!-- Options de Structure -->
+                        <div class="grid gap-6 mb-8">
+                            <!-- Option 1: Recommandée -->
+                            <div class="card-hover bg-white rounded-2xl shadow-lg border-2 border-indigo-200 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 bg-indigo-500 text-white px-4 py-1 text-sm font-medium">
+                                    Recommandé
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mr-4">
+                                            <span class="text-2xl">🏢</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                                PAR CLIENTS
+                                                <span class="text-sm font-normal text-indigo-600 ml-2">(87% correspondance)</span>
+                                            </h3>
+                                            <p class="text-gray-600 mb-4">
+                                                Idéal pour gérer plusieurs clients simultanément. Chaque client a son espace dédié pour éviter la confusion.
+                                            </p>
+                                            <div class="text-sm text-gray-500 mb-4">
+                                                <strong>Structure :</strong> Prospects → Client A → Client B → Client C → Terminés
+                                            </div>
+                                            <div class="flex space-x-3">
+                                                <button onclick="previewStructure('client-based')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-medium hover:bg-indigo-200 transition-colors">
+                                                    👀 Voir un aperçu
+                                                </button>
+                                                <button onclick="selectStructure('client-based')" class="bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-600 transition-colors">
+                                                    Choisir cette structure
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Option 2: Alternative -->
+                            <div class="card-hover bg-white rounded-2xl shadow-lg border border-gray-200">
+                                <div class="p-6">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mr-4">
+                                            <span class="text-2xl">⚡</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                                PAR PROJETS
+                                                <span class="text-sm font-normal text-amber-600 ml-2">(65% correspondance)</span>
+                                            </h3>
+                                            <p class="text-gray-600 mb-4">
+                                                Focus sur les phases de vos projets. Idéal si vous travaillez par cycles avec des livrables précis.
+                                            </p>
+                                            <div class="text-sm text-gray-500 mb-4">
+                                                <strong>Structure :</strong> Analyse → Configuration → Tests → Déploiement
+                                            </div>
+                                            <div class="flex space-x-3">
+                                                <button onclick="previewStructure('project-based')" class="bg-amber-100 text-amber-700 px-4 py-2 rounded-lg font-medium hover:bg-amber-200 transition-colors">
+                                                    👀 Voir un aperçu
+                                                </button>
+                                                <button onclick="selectStructure('project-based')" class="bg-amber-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-amber-600 transition-colors">
+                                                    Choisir cette structure
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Option 3: Personnalisé -->
+                            <div class="card-hover bg-white rounded-2xl shadow-lg border border-gray-200">
+                                <div class="p-6">
+                                    <div class="flex items-start">
+                                        <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                                            <span class="text-2xl">🎨</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-gray-900 mb-2">PERSONNALISÉ</h3>
+                                            <p class="text-gray-600 mb-4">
+                                                Vous savez exactement ce que vous voulez ? Créez votre propre structure de A à Z.
+                                            </p>
+                                            <div class="flex space-x-3">
+                                                <button onclick="customStructure()" class="bg-purple-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-600 transition-colors">
+                                                    🛠️ Personnaliser
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button onclick="goToStep1()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                                ← Modifier ma description
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3: APERÇU INTERACTIF -->
+        <div id="step3" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-7xl mx-auto">
+                    
+                    <!-- Header Aperçu -->
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                            <span id="previewIcon">🏢</span> Aperçu : <span id="previewTitle">Organisation par Clients</span>
+                        </h2>
+                        <p class="text-gray-600">
+                            Voici comment votre espace sera organisé. Vous pourrez le modifier après création.
+                        </p>
+                    </div>
+
+                    <!-- Kanban Preview -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="kanbanPreview">
+                            <!-- Les colonnes seront générées dynamiquement -->
+                        </div>
+                    </div>
+
+                    <!-- Avantages -->
+                    <div class="bg-indigo-50 rounded-2xl p-6 mb-8">
+                        <h3 class="text-lg font-bold text-indigo-900 mb-4">💡 Pourquoi cette structure est parfaite pour vous :</h3>
+                        <div class="grid md:grid-cols-3 gap-4" id="advantagesList">
+                            <!-- Les avantages seront générés dynamiquement -->
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button onclick="goToStep2()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors">
+                            ← Changer de structure
+                        </button>
+                        <button onclick="goToStep4()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">
+                            ✨ Créer mon espace
+                        </button>
+                        <button onclick="customizeStructure()" class="bg-white border-2 border-indigo-500 text-indigo-600 px-6 py-3 rounded-xl font-medium hover:bg-indigo-50 transition-colors">
+                            🎨 Personnaliser →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4: ESPACE CRÉÉ -->
+        <div id="step4" class="step-content hidden">
+            <div class="min-h-screen bg-gray-50 py-12 px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                    
+                    <!-- Success Animation -->
+                    <div class="mb-8">
+                        <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6">
+                            <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                            🎉 Votre espace est prêt !
+                        </h2>
+                        <p class="text-xl text-gray-600 mb-8">
+                            Félicitations ! Votre organisation personnalisée a été créée avec succès.
+                        </p>
+                    </div>
+
+                    <!-- Récap -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6">📋 Récapitulatif de votre espace :</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 text-left">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">🎯 Type d'organisation :</h4>
+                                <p class="text-gray-600" id="finalStructureType">Organisation par Clients</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">📊 Colonnes créées :</h4>
+                                <p class="text-gray-600" id="finalColumns">4 colonnes personnalisées</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">⚡ Tâches d'exemple :</h4>
+                                <p class="text-gray-600">12 tâches pré-créées pour démarrer</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">🔗 Lien de partage :</h4>
+                                <p class="text-gray-600">workspace-abc123</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="bg-indigo-50 rounded-2xl p-6 mb-8">
+                        <h3 class="text-lg font-bold text-indigo-900 mb-4">🚀 Prochaines étapes :</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-left">
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-2xl mb-2">📝</div>
+                                <h4 class="font-semibold text-gray-900 mb-1">Ajoutez vos tâches</h4>
+                                <p class="text-sm text-gray-600">Commencez par ajouter vos vraies tâches en cours</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-2xl mb-2">🎨</div>
+                                <h4 class="font-semibold text-gray-900 mb-1">Personnalisez</h4>
+                                <p class="text-sm text-gray-600">Ajustez les couleurs, noms et organisation</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4">
+                                <div class="text-2xl mb-2">👥</div>
+                                <h4 class="font-semibold text-gray-900 mb-1">Invitez votre équipe</h4>
+                                <p class="text-sm text-gray-600">Partagez l'espace avec vos collaborateurs</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Finales -->
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button onclick="window.open('#', '_blank')" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">
+                            🚀 Accéder à mon espace
+                        </button>
+                        <button onclick="goToStep1()" class="bg-white border-2 border-gray-300 text-gray-700 px-6 py-4 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                            ➕ Créer un autre espace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // État de l'application
+        let currentStep = 1;
+        let selectedStructure = null;
+        let userActivityText = '';
+
+        // Exemples prédéfinis
+        const examples = {
+            consultant: "Je suis consultant IT spécialisé en transformation digitale. Je gère simultanément 3-4 projets clients avec des équipes techniques mixtes. Entre les phases d'analyse, de configuration système et le support utilisateur, j'ai besoin d'une organisation claire par client.",
+            manager: "Je manage une équipe produit de 8 personnes sur plusieurs fonctionnalités. Nous travaillons en cycles de 2 semaines avec des sprints définis. Je dois coordonner le développement, les tests et les déploiements tout en gardant une vue d'ensemble des priorités.",
+            freelance: "Développeur web freelance, je jongle entre plusieurs projets clients simultanément. Sites e-commerce, applications mobiles, maintenance... Chaque projet a ses propres échéances et je dois optimiser mon temps entre développement, relation client et prospection.",
+            startup: "Fondateur d'une startup en phase de croissance. Je dois gérer le développement produit, le marketing, les ventes et l'équipe. Entre les features à prioriser, les bugs à corriger et la stratégie business, j'ai besoin d'une vue globale organisée."
+        };
+
+        // Structures prédéfinies
+        const structures = {
+            'client-based': {
+                title: 'Organisation par Clients',
+                icon: '🏢',
+                columns: [
+                    { name: '🎯 Prospects', tasks: ['Lead Banque ABC', 'Contact Startup Tech', 'RDV PME Locale'] },
+                    { name: '🏢 Client Alpha', tasks: ['Audit SI complet', 'Roadmap Digital', 'Formation équipe'] },
+                    { name: '🏭 Client Beta', tasks: ['Migration ERP', 'Tests utilisateur', 'Go-Live'] },
+                    { name: '📦 Terminés', tasks: ['Projet Gamma', 'Support Delta'] }
+                ],
+                advantages: [
+                    'Chaque client a son espace dédié',
+                    'Évite la confusion entre projets',
+                    'Suivi personnalisé par client'
+                ]
+            },
+            'project-based': {
+                title: 'Organisation par Projets',
+                icon: '⚡',
+                columns: [
+                    { name: '🔍 Analyse', tasks: ['Recueil besoins Client A', 'Audit technique existant', 'Architecture solution'] },
+                    { name: '⚙️ Configuration', tasks: ['Setup environnement', 'Paramétrage système', 'Dev connecteurs'] },
+                    { name: '🧪 Tests', tasks: ['Tests unitaires', 'Tests intégration', 'UAT Client'] },
+                    { name: '🚀 Déploiement', tasks: ['Mise en prod', 'Formation', 'Documentation'] }
+                ],
+                advantages: [
+                    'Vision claire des phases projet',
+                    'Workflow standardisé et efficace',
+                    'Facilite le suivi d\'avancement'
+                ]
+            }
+        };
+
+        // Gestion du textarea
+        document.getElementById('userActivity').addEventListener('input', function() {
+            const text = this.value;
+            const charCount = text.length;
+            const btn = document.getElementById('analyzeBtn');
+            
+            document.getElementById('charCount').textContent = `${charCount}/500`;
+            btn.disabled = charCount < 10;
+            
+            userActivityText = text;
+        });
+
+        // Fonctions de navigation
+        function goToStep(step) {
+            // Masquer toutes les étapes
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            
+            // Afficher l'étape demandée
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            // Mettre à jour les indicateurs
+            updateStepIndicators(step);
+            
+            currentStep = step;
+        }
+
+        function updateStepIndicators(activeStep) {
+            for (let i = 1; i <= 4; i++) {
+                const indicator = document.querySelector(`.step-indicator:nth-child(${i * 2 - 1})`);
+                if (indicator) { // Vérification d'existence
+                    if (i < activeStep) {
+                        indicator.className = 'step-indicator step-completed rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold';
+                    } else if (i === activeStep) {
+                        indicator.className = 'step-indicator step-active rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold';
+                    } else {
+                        indicator.className = 'step-indicator step-pending rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold';
+                    }
+                }
+            }
+        }
+
+        function goToStep1() {
+            // Reset de l'état pour permettre un nouveau test
+            resetAnalysisState();
+            goToStep(1);
+        }
+
+        function resetAnalysisState() {
+            // Réinitialiser l'état d'analyse
+            document.getElementById('analysisResult').classList.add('hidden');
+            document.getElementById('analysisText').textContent = 'Notre IA analyse votre description pour identifier le meilleur type d\'organisation...';
+            
+            // Réinitialiser l'icône
+            const spinIcon = document.querySelector('#step2 .w-8.h-8 svg');
+            if (spinIcon) {
+                spinIcon.classList.add('animate-spin');
+                spinIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>';
+            }
+        }
+
+        function goToStep2() {
+            goToStep(2);
+            // Simuler l'analyse avec progression réaliste
+            
+            // Étape 1: Analyse en cours (500ms)
+            setTimeout(() => {
+                document.getElementById('analysisText').textContent = 'Analyse des mots-clés et contexte métier...';
+            }, 500);
+            
+            // Étape 2: IA Processing (1000ms)
+            setTimeout(() => {
+                document.getElementById('analysisText').textContent = 'Génération des recommandations personnalisées...';
+            }, 1200);
+            
+            // Étape 3: Finalisation (1500ms)
+            setTimeout(() => {
+                document.getElementById('analysisText').textContent = 'Optimisation des structures pour votre profil...';
+            }, 1800);
+            
+            // Étape 4: Résultats (2000ms)
+            setTimeout(() => {
+                // Masquer l'animation de chargement
+                const spinIcon = document.querySelector('#step2 .animate-spin');
+                if (spinIcon) {
+                    spinIcon.classList.remove('animate-spin');
+                    spinIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+                }
+                
+                // Afficher les résultats
+                document.getElementById('analysisText').textContent = 'Analyse terminée ! Voici vos options personnalisées :';
+                document.getElementById('analysisResult').classList.remove('hidden');
+                
+                // Animation d'apparition progressive des options
+                const options = document.querySelectorAll('#analysisResult .card-hover');
+                options.forEach((option, index) => {
+                    option.style.opacity = '0';
+                    option.style.transform = 'translateY(20px)';
+                    option.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        option.style.opacity = '1';
+                        option.style.transform = 'translateY(0)';
+                    }, index * 150);
+                });
+            }, 2200);
+        }
+
+        function goToStep4() {
+            goToStep(4);
+            // Mettre à jour le récap
+            if (selectedStructure) {
+                const structure = structures[selectedStructure];
+                document.getElementById('finalStructureType').textContent = structure.title;
+                document.getElementById('finalColumns').textContent = `${structure.columns.length} colonnes : ${structure.columns.map(c => c.name.replace(/[🎯🏢🏭📦🔍⚙️🧪🚀]/g, '')).join(', ')}`;
+            }
+        }
+
+        // Fonctions pour les exemples
+        function setExample(type) {
+            const textarea = document.getElementById('userActivity');
+            textarea.value = examples[type];
+            textarea.dispatchEvent(new Event('input'));
+        }
+
+        // Fonctions pour les structures
+        function previewStructure(structureType) {
+            selectedStructure = structureType;
+            const structure = structures[structureType];
+            
+            // Mettre à jour le titre et l'icône
+            document.getElementById('previewTitle').textContent = structure.title;
+            document.getElementById('previewIcon').textContent = structure.icon;
+            
+            // Générer le kanban preview
+            const kanban = document.getElementById('kanbanPreview');
+            kanban.innerHTML = structure.columns.map(column => `
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <h3 class="font-bold text-gray-900 mb-3">${column.name}</h3>
+                    <div class="space-y-2">
+                        ${column.tasks.map(task => `
+                            <div class="kanban-card bg-white rounded-lg p-3 shadow-sm border">
+                                <p class="text-sm text-gray-700">${task}</p>
+                            </div>
+                        `).join('')}
+                        <button class="w-full bg-gray-100 text-gray-500 rounded-lg p-2 text-sm hover:bg-gray-200 transition-colors">
+                            + Nouvelle tâche
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Générer les avantages
+            const advantages = document.getElementById('advantagesList');
+            advantages.innerHTML = structure.advantages.map(advantage => `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <p class="text-indigo-800">${advantage}</p>
+                </div>
+            `).join('');
+            
+            goToStep(3);
+        }
+
+        function selectStructure(structureType) {
+            selectedStructure = structureType;
+            goToStep4();
+        }
+
+        function customStructure() {
+            alert('Fonctionnalité de personnalisation - À implémenter dans la vraie application');
+        }
+
+        function customizeStructure() {
+            alert('Fonctionnalité de personnalisation - À implémenter dans la vraie application');
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier que les indicateurs existent avant de les mettre à jour
+            const indicators = document.querySelectorAll('.step-indicator');
+            if (indicators.length > 0) {
+                updateStepIndicators(1);
+            }
+        });
+    </script>
+</body>
+</html>

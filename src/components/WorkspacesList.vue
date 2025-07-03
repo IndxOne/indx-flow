@@ -1,5 +1,12 @@
 <template>
   <div>
+    <!-- Sélecteur de missions pour Technicien SI -->
+    <TechnicienMissionSelector 
+      v-if="profileType === 'technicien-si' && route.meta?.showMissionSelector" 
+    />
+    
+    <!-- Liste normale des workspaces pour autres profils ou missions spécifiques -->
+    <div v-else>
     <!-- Message si aucun workspace -->
     <div v-if="workspaces.length === 0" class="text-center py-12">
       <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
@@ -16,7 +23,7 @@
       </p>
       
       <router-link 
-        :to="`/${profileType}/new`"
+        :to="missionId ? `/${profileType}/${missionId}/new` : `/${profileType}/new`"
         class="btn-primary"
       >
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,6 +261,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -261,6 +269,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProfileStore } from '../stores/profileStore.js'
+import TechnicienMissionSelector from './TechnicienMissionSelector.vue'
 
 // Props du router
 const route = useRoute()
@@ -275,13 +284,32 @@ const activeMenu = ref(null)
 
 // Computed
 const profileType = computed(() => route.params.profileType)
+const missionId = computed(() => route.params.missionId)
 
 const currentProfile = computed(() => {
   return profileStore.getProfileById(profileType.value)
 })
 
+const currentMission = computed(() => {
+  if (profileType.value === 'technicien-si' && missionId.value) {
+    const technicienProfile = profileStore.getProfileById('technicien-si')
+    return technicienProfile.missions?.[missionId.value]
+  }
+  return null
+})
+
 const workspaces = computed(() => {
-  return profileStore.getWorkspacesByProfile(profileType.value)
+  const allWorkspaces = profileStore.getWorkspacesByProfile(profileType.value)
+  
+  // Si on est sur une mission spécifique, filtrer par mission
+  if (missionId.value) {
+    return allWorkspaces.filter(workspace => 
+      workspace.missionId === missionId.value ||
+      workspace.project_type?.includes(missionId.value.toUpperCase())
+    )
+  }
+  
+  return allWorkspaces
 })
 
 const filteredWorkspaces = computed(() => {
@@ -313,6 +341,10 @@ const filteredWorkspaces = computed(() => {
 })
 
 const emptyStateTitle = computed(() => {
+  if (currentMission.value) {
+    return `Aucun projet ${currentMission.value.label} encore`
+  }
+  
   const titles = {
     'consultant-si': 'Aucun projet client encore',
     'technicien-si': 'Aucun projet ERP en cours',
@@ -322,6 +354,10 @@ const emptyStateTitle = computed(() => {
 })
 
 const emptyStateDescription = computed(() => {
+  if (currentMission.value) {
+    return `Créez votre premier projet ${currentMission.value.label} avec une structure optimisée : ${currentMission.value.structure.join(' → ')}`
+  }
+  
   const descriptions = {
     'consultant-si': 'Créez votre premier espace pour organiser vos projets clients avec une structure optimisée.',
     'technicien-si': 'Démarrez votre premier projet ERP avec une structure adaptée aux phases techniques.',
@@ -331,6 +367,10 @@ const emptyStateDescription = computed(() => {
 })
 
 const createButtonText = computed(() => {
+  if (currentMission.value) {
+    return `Créer un projet ${currentMission.value.label}`
+  }
+  
   const texts = {
     'consultant-si': 'Créer un projet client',
     'technicien-si': 'Créer un projet ERP',

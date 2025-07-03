@@ -3,21 +3,29 @@
     <!-- Header -->
     <div class="text-center">
       <h2 class="text-2xl font-bold text-gray-900 mb-2">
-        Questions adaptées à votre profil
+        🔍 Analyse terminée !
       </h2>
       <p class="text-gray-600 max-w-2xl mx-auto">
-        Questions personnalisées basées sur vos contextes détectés :
-        <span v-if="hasMultipleContexts" class="block mt-2 space-x-2">
-          <span v-for="context in formStore.detectedContexts" 
-                :key="context.type"
-                class="context-badge text-xs" 
-                :class="getContextBadgeClass(context.type)">
-            {{ formatContextType(context.type) }}
+        <span v-if="hasMultipleContexts">
+          Nous avons identifié votre profil multi-contextes :
+          <span class="block mt-2 space-x-2">
+            <span v-for="context in formStore.detectedContexts" 
+                  :key="context.type"
+                  class="context-badge text-xs" 
+                  :class="getContextBadgeClass(context.type)">
+              {{ formatContextType(context.type) }}
+            </span>
           </span>
         </span>
-        <span v-else class="context-badge" :class="contextBadgeClass">
-          {{ formatContextType(formStore.detectedContext) }}
+        <span v-else>
+          Profil détecté : 
+          <span class="context-badge" :class="contextBadgeClass">
+            {{ formatContextType(formStore.detectedContext) }}
+          </span>
         </span>
+      </p>
+      <p class="text-lg text-gray-700 mt-4">
+        📊 Choisissez la structure qui vous convient le mieux :
       </p>
     </div>
 

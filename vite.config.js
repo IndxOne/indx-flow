@@ -30,11 +30,25 @@ export default defineConfig({
   ],
   server: {
     port: 3002,
+    host: true, // Permet l'accès depuis n'importe quelle IP
+    hmr: {
+      overlay: true, // Affiche les erreurs en overlay
+      port: 3003 // Port séparé pour HMR
+    },
+    watch: {
+      // Force le watching sur WSL/Windows
+      usePolling: true,
+      interval: 100
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false
       }
     }
+  },
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'pinia'] // Pre-bundle pour performance
   }
 })

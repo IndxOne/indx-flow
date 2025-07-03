@@ -6,8 +6,8 @@
       @next="formStore.nextStep"
     />
     
-    <!-- Step 2: Adaptive Questions -->
-    <StepAdaptiveQuestions 
+    <!-- Step 2: Structure Choice -->
+    <StepStructureChoice 
       v-if="formStore.currentStep === 2"
       @next="formStore.nextStep"
       @prev="formStore.prevStep"
@@ -41,7 +41,7 @@ import { useFormStore } from '../stores/formStore.js'
 
 // Components
 import StepContextCapture from './steps/StepContextCapture.vue'
-import StepAdaptiveQuestions from './steps/StepAdaptiveQuestions.vue'
+import StepStructureChoice from './steps/StepStructureChoice.vue'
 import StepStructurePreview from './steps/StepStructurePreview.vue'
 import StepFinalInfo from './steps/StepFinalInfo.vue'
 import StepConfirmation from './steps/StepConfirmation.vue'

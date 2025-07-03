@@ -93,18 +93,322 @@ export const useProfileStore = defineStore('profile', () => {
     'technicien-si': {
       id: 'technicien-si',
       label: 'Technicien SI',
-      description: 'Projets ERP et infrastructure technique',
+      description: 'Missions techniques variées : intégration, maintenance, support, développement',
       icon: '🔧',
       color: 'emerald',
       
       preferredContexts: ['PROCESS_BASED', 'PHASED', 'RESOURCE_BASED'],
       
+      // Structure générique (remplacée par missions spécialisées)
       defaultStructure: [
-        '🎯 Analyse & Spécification',
-        '⚙️ Paramétrage & Config',
-        '🧪 Tests & Validation',
-        '🚀 Formation & Go-Live'
+        '🎯 Analyse',
+        '⚙️ Configuration',
+        '🧪 Tests',
+        '✅ Livraison'
       ],
+      
+      // 🚀 MISSIONS SPÉCIALISÉES TECHNICIEN SI
+      missions: {
+        'integration-systemes': {
+          id: 'integration-systemes',
+          label: 'Intégration Systèmes',
+          description: 'Intégration ERP et systèmes interconnectés',
+          icon: '🏗️',
+          structure: [
+            '📋 Analyse',
+            '⚙️ Configuration', 
+            '🧪 Tests',
+            '🚀 Go-Live'
+          ],
+          contexts: ['PROCESS_BASED', 'PHASED'],
+          questions: [
+            {
+              key: 'systemType',
+              type: 'select',
+              label: 'Type de système principal',
+              options: [
+                { value: 'erp', label: 'ERP (SAP, Oracle, Dynamics)' },
+                { value: 'crm', label: 'CRM (Salesforce, HubSpot)' },
+                { value: 'bi', label: 'BI/Analytics (Power BI, Tableau)' },
+                { value: 'custom', label: 'Développement spécifique' }
+              ]
+            },
+            {
+              key: 'integrationComplexity',
+              type: 'select',
+              label: 'Complexité de l\'intégration',
+              options: [
+                { value: 'simple', label: 'Simple (1-2 systèmes)' },
+                { value: 'medium', label: 'Moyenne (3-5 systèmes)' },
+                { value: 'complex', label: 'Complexe (5+ systèmes)' }
+              ]
+            }
+          ],
+          defaultTasks: [
+            {
+              title: 'Cartographie systèmes existants',
+              description: 'Inventaire et analyse des systèmes à intégrer',
+              columnIndex: 0,
+              subtasks: [
+                { text: 'Audit architecture existante', dueDate: null },
+                { text: 'Identification des flux de données', dueDate: null },
+                { text: 'Analyse des contraintes techniques', dueDate: null }
+              ]
+            },
+            {
+              title: 'Paramétrage connecteurs',
+              description: 'Configuration des interfaces et connecteurs',
+              columnIndex: 1,
+              subtasks: [
+                { text: 'Configuration API', dueDate: null },
+                { text: 'Mapping des données', dueDate: null },
+                { text: 'Tests unitaires connecteurs', dueDate: null }
+              ]
+            }
+          ]
+        },
+        
+        'maintenance-ticketing': {
+          id: 'maintenance-ticketing',
+          label: 'Maintenance/Ticketing',
+          description: 'Gestion des incidents et maintenance corrective',
+          icon: '🎫',
+          structure: [
+            '📥 Nouveau',
+            '🔧 En cours',
+            '✅ Test',
+            '✨ Résolu'
+          ],
+          contexts: ['PROCESS_BASED', 'RESOURCE_BASED'],
+          questions: [
+            {
+              key: 'ticketingTool',
+              type: 'select',
+              label: 'Outil de ticketing',
+              options: [
+                { value: 'jira', label: 'Jira Service Management' },
+                { value: 'servicenow', label: 'ServiceNow' },
+                { value: 'freshdesk', label: 'Freshdesk' },
+                { value: 'other', label: 'Autre outil' }
+              ]
+            },
+            {
+              key: 'priorityLevels',
+              type: 'multiselect',
+              label: 'Niveaux de priorité gérés',
+              options: [
+                { value: 'critical', label: 'Critique (< 2h)' },
+                { value: 'high', label: 'Haute (< 4h)' },
+                { value: 'medium', label: 'Moyenne (< 24h)' },
+                { value: 'low', label: 'Basse (< 72h)' }
+              ]
+            }
+          ],
+          defaultTasks: [
+            {
+              title: 'Bug critique production',
+              description: 'Erreur bloquante sur l\'application métier',
+              columnIndex: 0,
+              priority: 'high',
+              subtasks: [
+                { text: 'Reproduction du bug', dueDate: null },
+                { text: 'Analyse logs système', dueDate: null },
+                { text: 'Identification cause racine', dueDate: null }
+              ]
+            },
+            {
+              title: 'Optimisation performance',
+              description: 'Amélioration temps de réponse base de données',
+              columnIndex: 1,
+              priority: 'medium',
+              subtasks: [
+                { text: 'Analyse requêtes lentes', dueDate: null },
+                { text: 'Optimisation index', dueDate: null },
+                { text: 'Tests de charge', dueDate: null }
+              ]
+            }
+          ]
+        },
+        
+        'support-programme': {
+          id: 'support-programme',
+          label: 'Support Programmé',
+          description: 'Support utilisateurs planifié par semaines',
+          icon: '📅',
+          structure: [
+            '📅 Semaine 28',
+            '📅 Semaine 29', 
+            '📅 Semaine 30',
+            '📦 Archive'
+          ],
+          contexts: ['TEMPORAL', 'RESOURCE_BASED'],
+          questions: [
+            {
+              key: 'supportType',
+              type: 'select',
+              label: 'Type de support principal',
+              options: [
+                { value: 'user_training', label: 'Formation utilisateurs' },
+                { value: 'functional_support', label: 'Support fonctionnel' },
+                { value: 'technical_assistance', label: 'Assistance technique' },
+                { value: 'change_management', label: 'Accompagnement au changement' }
+              ]
+            },
+            {
+              key: 'weeklyCapacity',
+              type: 'select',
+              label: 'Capacité hebdomadaire',
+              options: [
+                { value: 'light', label: 'Légère (5-10 demandes/semaine)' },
+                { value: 'medium', label: 'Moyenne (10-20 demandes/semaine)' },
+                { value: 'heavy', label: 'Intensive (20+ demandes/semaine)' }
+              ]
+            }
+          ],
+          defaultTasks: [
+            {
+              title: 'Formation groupe comptabilité',
+              description: 'Session formation nouveau module ERP',
+              columnIndex: 0,
+              subtasks: [
+                { text: 'Préparation supports', dueDate: '2025-07-15' },
+                { text: 'Session formation (2h)', dueDate: '2025-07-16' },
+                { text: 'Suivi post-formation', dueDate: '2025-07-17' }
+              ]
+            },
+            {
+              title: 'Support demandes RH',
+              description: 'Assistance quotidienne équipe RH',
+              columnIndex: 1,
+              subtasks: [
+                { text: 'Traitement demandes nouvelles', dueDate: '2025-07-22' },
+                { text: 'Optimisation processus', dueDate: '2025-07-23' },
+                { text: 'Documentation FAQ', dueDate: '2025-07-24' }
+              ]
+            }
+          ]
+        },
+        
+        'developpement-outils': {
+          id: 'developpement-outils',
+          label: 'Développement Outils',
+          description: 'Développement d\'outils internes et solutions spécifiques',
+          icon: '⚙️',
+          structure: [
+            '📋 Analyse',
+            '🎨 Conception',
+            '🚀 Déploiement',
+            '📊 Suivi'
+          ],
+          contexts: ['PHASED', 'VERSIONED'],
+          questions: [
+            {
+              key: 'devType',
+              type: 'select',
+              label: 'Type de développement',
+              options: [
+                { value: 'web_app', label: 'Application web' },
+                { value: 'automation', label: 'Script d\'automatisation' },
+                { value: 'integration', label: 'Connecteur/API' },
+                { value: 'reporting', label: 'Outil de reporting' }
+              ]
+            },
+            {
+              key: 'techStack',
+              type: 'multiselect',
+              label: 'Technologies utilisées',
+              options: [
+                { value: 'python', label: 'Python' },
+                { value: 'javascript', label: 'JavaScript/Node.js' },
+                { value: 'csharp', label: 'C#/.NET' },
+                { value: 'sql', label: 'SQL/Base de données' },
+                { value: 'powershell', label: 'PowerShell' }
+              ]
+            }
+          ],
+          defaultTasks: [
+            {
+              title: 'Outil reporting automatisé',
+              description: 'Développement dashboard KPI temps réel',
+              columnIndex: 0,
+              subtasks: [
+                { text: 'Analyse besoins utilisateurs', dueDate: null },
+                { text: 'Spécifications fonctionnelles', dueDate: null },
+                { text: 'Choix architecture technique', dueDate: null }
+              ]
+            },
+            {
+              title: 'API intégration comptabilité',
+              description: 'Connecteur automatique ERP → comptabilité',
+              columnIndex: 1,
+              subtasks: [
+                { text: 'Développement API REST', dueDate: null },
+                { text: 'Système d\'authentification', dueDate: null },
+                { text: 'Tests intégration', dueDate: null }
+              ]
+            }
+          ]
+        },
+        
+        'gestion-projet': {
+          id: 'gestion-projet',
+          label: 'Gestion Projet',
+          description: 'Coordination projet selon le rôle (PMO, Dev Lead, Tech Lead)',
+          icon: '📊',
+          structure: [
+            '🎯 Planning',
+            '👥 Équipe',
+            '📊 Suivi',
+            '✅ Livraison'
+          ],
+          contexts: ['RESOURCE_BASED', 'TEMPORAL'],
+          questions: [
+            {
+              key: 'projectRole',
+              type: 'select',
+              label: 'Votre rôle dans le projet',
+              options: [
+                { value: 'pmo', label: 'PMO (Project Management Office)' },
+                { value: 'dev_lead', label: 'Dev Lead (Responsable développement)' },
+                { value: 'tech_lead', label: 'Tech Lead (Architecture technique)' },
+                { value: 'project_manager', label: 'Chef de projet' }
+              ]
+            },
+            {
+              key: 'teamSize',
+              type: 'select',
+              label: 'Taille de l\'équipe projet',
+              options: [
+                { value: 'small', label: 'Petite (2-5 personnes)' },
+                { value: 'medium', label: 'Moyenne (6-12 personnes)' },
+                { value: 'large', label: 'Grande (12+ personnes)' }
+              ]
+            }
+          ],
+          defaultTasks: [
+            {
+              title: 'Planning sprint 2 semaines',
+              description: 'Organisation du prochain sprint équipe',
+              columnIndex: 0,
+              subtasks: [
+                { text: 'Rétrospective sprint précédent', dueDate: null },
+                { text: 'Estimation user stories', dueDate: null },
+                { text: 'Répartition tâches équipe', dueDate: null }
+              ]
+            },
+            {
+              title: 'Suivi avancement développement',
+              description: 'Coordination technique et livraisons',
+              columnIndex: 2,
+              subtasks: [
+                { text: 'Daily standup équipe', dueDate: null },
+                { text: 'Review code développeurs', dueDate: null },
+                { text: 'Coordination avec autres équipes', dueDate: null }
+              ]
+            }
+          ]
+        }
+      },
       
       adaptiveQuestions: [
         {

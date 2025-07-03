@@ -65,14 +65,17 @@
         
         <div class="grid grid-cols-2 gap-2">
           <div 
-            v-for="(column, index) in formStore.structurePreview" 
-            :key="index"
+            v-for="(column, index) in finalStructureColumns" 
+            :key="column.id || index"
             class="bg-gray-50 rounded-lg p-3 text-center border"
+            :class="getColumnColorClass(column.color)"
           >
-            <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-1">
-              <span class="text-indigo-600 text-xs font-bold">{{ index + 1 }}</span>
+            <div class="w-6 h-6 rounded-full flex items-center justify-center mx-auto mb-1"
+                 :class="getColumnIconClass(column.color)">
+              <span class="text-xs font-bold">{{ index + 1 }}</span>
             </div>
-            <div class="text-sm font-medium text-gray-900">{{ column }}</div>
+            <div class="text-sm font-medium text-gray-900">{{ column.name }}</div>
+            <div v-if="column.description" class="text-xs text-gray-500 mt-1">{{ column.description }}</div>
           </div>
         </div>
       </div>
@@ -135,7 +138,7 @@
         </div>
         <div>
           <div class="text-2xl font-bold text-orange-600">
-            {{ formStore.structurePreview?.length || 4 }}
+            {{ finalStructureColumns.length }}
           </div>
           <div class="text-xs text-gray-600">Colonnes générées</div>
         </div>
@@ -177,6 +180,13 @@
         >
           🚀 Générer l'espace de travail
         </button>
+        
+        <router-link
+          to="/workspace-update"
+          class="btn-secondary text-center"
+        >
+          🔄 Mettre à jour un espace existant
+        </router-link>
         
         <a 
           href="/analytics"
@@ -332,6 +342,40 @@ const nextSteps = computed(() => {
   return baseSteps[formStore.detectedContext] || baseSteps.CLIENT_BASED
 })
 
+const finalStructureColumns = computed(() => {
+  // Gérer les deux formats possibles : ancien (tableau de chaînes) et nouveau (objet avec columns)
+  const structure = formStore.structurePreview
+  
+  if (!structure) {
+    return [
+      { id: 'col-1', name: 'À faire', description: 'Tâches à réaliser', color: 'blue' },
+      { id: 'col-2', name: 'En cours', description: 'Tâches en progress', color: 'amber' },
+      { id: 'col-3', name: 'En attente', description: 'Tâches en attente', color: 'purple' },
+      { id: 'col-4', name: 'Terminé', description: 'Tâches complétées', color: 'green' }
+    ]
+  }
+  
+  // Nouveau format avec colonnes détaillées
+  if (structure.columns && Array.isArray(structure.columns)) {
+    console.log('📋 [CONFIRMATION] Structure avec colonnes détaillées:', structure.columns)
+    return structure.columns
+  }
+  
+  // Ancien format : simple tableau de chaînes
+  if (Array.isArray(structure)) {
+    console.log('📋 [CONFIRMATION] Structure simple (tableau):', structure)
+    return structure.map((name, index) => ({
+      id: `col-${index}`,
+      name,
+      description: `Colonne ${index + 1}`,
+      color: ['blue', 'amber', 'purple', 'green'][index % 4]
+    }))
+  }
+  
+  console.warn('⚠️ [CONFIRMATION] Format de structure non reconnu:', structure)
+  return []
+})
+
 // Methods
 const formatContextType = (type) => {
   const formats = {
@@ -354,8 +398,52 @@ const getModeLabel = (mode) => {
   return labels[mode] || mode
 }
 
+const getColumnColorClass = (color) => {
+  const colorClasses = {
+    red: 'hover:border-red-300 hover:bg-red-50',
+    blue: 'hover:border-blue-300 hover:bg-blue-50',
+    green: 'hover:border-green-300 hover:bg-green-50',
+    yellow: 'hover:border-yellow-300 hover:bg-yellow-50',
+    purple: 'hover:border-purple-300 hover:bg-purple-50',
+    amber: 'hover:border-amber-300 hover:bg-amber-50',
+    emerald: 'hover:border-emerald-300 hover:bg-emerald-50',
+    cyan: 'hover:border-cyan-300 hover:bg-cyan-50',
+    indigo: 'hover:border-indigo-300 hover:bg-indigo-50',
+    violet: 'hover:border-violet-300 hover:bg-violet-50',
+    gray: 'hover:border-gray-300 hover:bg-gray-50'
+  }
+  return colorClasses[color] || 'hover:border-indigo-300 hover:bg-indigo-50'
+}
+
+const getColumnIconClass = (color) => {
+  const iconClasses = {
+    red: 'bg-red-100 text-red-600',
+    blue: 'bg-blue-100 text-blue-600',
+    green: 'bg-green-100 text-green-600',
+    yellow: 'bg-yellow-100 text-yellow-600',
+    purple: 'bg-purple-100 text-purple-600',
+    amber: 'bg-amber-100 text-amber-600',
+    emerald: 'bg-emerald-100 text-emerald-600',
+    cyan: 'bg-cyan-100 text-cyan-600',
+    indigo: 'bg-indigo-100 text-indigo-600',
+    violet: 'bg-violet-100 text-violet-600',
+    gray: 'bg-gray-100 text-gray-600'
+  }
+  return iconClasses[color] || 'bg-indigo-100 text-indigo-600'
+}
+
 const generateWorkspace = async () => {
   try {
+    // 0. PERSISTENCE: S'assurer que l'email utilisateur est sauvegardé
+    if (formStore.userInfo.email) {
+      try {
+        localStorage.setItem('indx_user_email', formStore.userInfo.email)
+        console.log('💾 [WORKSPACE] Email persisté pour future récupération:', formStore.userInfo.email)
+      } catch (error) {
+        console.warn('❌ [WORKSPACE] Erreur persistence email:', error)
+      }
+    }
+    
     // 1. Sauvegarder l'analyse dans Supabase
     console.log('💾 [WORKSPACE] Sauvegarde de l\'analyse dans Supabase...')
     const analysisResult = await formStore.saveAnalysisToSupabase()

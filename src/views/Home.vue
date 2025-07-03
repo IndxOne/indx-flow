@@ -1,238 +1,297 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <h1 class="text-2xl font-bold text-gray-900">
-                INDX <span class="text-indigo-600">Flow</span>
-              </h1>
-            </div>
-            <div class="ml-6 hidden md:block">
-              <p class="text-sm text-gray-600">
-                Détection Contextuelle Intelligente
-              </p>
-            </div>
-          </div>
-          
-          <!-- Mode Toggle -->
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
-              <label class="text-sm font-medium text-gray-700">Mode:</label>
-              <select 
-                v-model="formStore.detectionMode" 
-                class="form-input text-sm py-1 px-2"
-                @change="onModeChange"
-              >
-                <option value="local">Local (Gratuit)</option>
-                <option value="ai">IA (Précis)</option>
-                <option value="hybrid">Hybride (Optimal)</option>
-              </select>
-            </div>
-            
-            <router-link 
-              to="/analytics" 
-              class="btn-secondary text-sm py-1 px-3"
-            >
-              📊 Analytics
-            </router-link>
-          </div>
-        </div>
-      </div>
+  <div class="gradient-bg px-6">
+    <!-- Header ultra-épuré -->
+    <header class="absolute top-4 right-4 z-10">
+      <router-link 
+        to="/workspaces" 
+        class="btn-glass text-white px-3 py-2 rounded-lg text-sm"
+        title="Mes espaces existants"
+      >
+        📁
+      </router-link>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Progress Bar -->
-      <div class="mb-8">
-        <ProgressBar 
-          :current-step="formStore.currentStep" 
-          :max-steps="formStore.maxSteps"
-          :progress="formStore.progress"
-        />
-      </div>
+    <!-- Main Content - Interface épurée style ux-demo.html -->
+    <div class="main-container">
+      <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 card-main">
+        <!-- Header épuré -->
+        <div class="mb-8">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            🎯 INDX Flow
+          </h1>
+          <p class="text-lg text-gray-600">
+            L'IA crée la structure parfaite pour votre travail
+          </p>
+        </div>
 
-      <!-- Mode Info Banner -->
-      <div v-if="showModeInfo" class="mb-6">
-        <div class="card bg-blue-50 border-blue-200">
-          <div class="flex items-start">
-            <div class="flex-shrink-0">
-              <component :is="modeIcon" class="h-5 w-5 text-blue-600 mt-0.5" />
-            </div>
-            <div class="ml-3 flex-1">
-              <h3 class="text-sm font-medium text-blue-800">{{ modeInfo.title }}</h3>
-              <p class="text-sm text-blue-700 mt-1">{{ modeInfo.description }}</p>
-              <div class="flex items-center mt-2 text-xs text-blue-600">
-                <span>⚡ {{ modeInfo.speed }}</span>
-                <span class="mx-2">•</span>
-                <span>💰 {{ modeInfo.cost }}</span>
-                <span class="mx-2">•</span>
-                <span>🎯 {{ modeInfo.accuracy }}</span>
-              </div>
-            </div>
+        <!-- Formulaire principal -->
+        <div class="mb-8">
+          <textarea 
+            v-model="userInput"
+            @input="onInputChange"
+            placeholder="Décrivez votre activité en quelques mots...&#10;&#10;Ex: 'Je suis consultant IT, je gère des projets pour plusieurs clients avec une équipe technique. Je dois jongler entre maintenance, nouveaux projets et support utilisateur.'"
+            class="w-full h-32 p-4 border-2 border-gray-200 rounded-xl resize-none focus:border-indigo-500 focus:outline-none text-gray-700"
+            maxlength="500"
+          />
+          <div class="text-right mt-2">
+            <span class="text-xs text-gray-400">{{ userInput.length }}/500</span>
+          </div>
+        </div>
+
+        <!-- Bouton principal -->
+        <button 
+          @click="startAnalysis"
+          :disabled="userInput.length < 10"
+          class="w-full btn-gradient text-white py-4 px-8 rounded-xl font-semibold text-lg"
+          :class="{ 'pulse': userInput.length >= 10 }"
+        >
+          ✨ Créer mon organisation
+        </button>
+
+        <!-- Exemples simplifiés -->
+        <div class="mt-6">
+          <div class="flex flex-wrap gap-2 justify-center">
             <button 
-              @click="showModeInfo = false"
-              class="flex-shrink-0 text-blue-400 hover:text-blue-600"
+              v-for="example in examples.slice(0, 3)" 
+              :key="example.key"
+              @click="setExample(example.text)"
+              class="example-tag bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-indigo-500 hover:text-white transition-all duration-200"
             >
-              <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-              </svg>
+              {{ example.icon }} {{ example.label }}
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Formulaire Multi-étapes -->
-      <div class="card">
-        <FormulairePrincipal />
       </div>
-
-      <!-- Cost Tracking (Development) -->
-      <div v-if="isDevelopment && formStore.costTracking.totalCost > 0" class="mt-6">
-        <CostDisplay :cost-data="formStore.costTracking" />
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="mt-16 bg-gray-50 border-t border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="text-center text-sm text-gray-600">
-          <p>
-            INDX Flow - Intelligence contextuelle pour organisation optimale
-          </p>
-          <p class="mt-1">
-            Développé avec Vue.js 3 • Analyse locale + IA Claude • 
-            <button 
-              @click="showTechDetails = !showTechDetails"
-              class="text-indigo-600 hover:text-indigo-800"
-            >
-              Détails techniques
-            </button>
-          </p>
-          
-          <!-- Tech Details (collapsible) -->
-          <div v-if="showTechDetails" class="mt-4 text-xs text-gray-500 max-w-2xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <strong>Frontend:</strong><br>
-                Vue.js 3 + Vite + Tailwind<br>
-                PWA Ready
-              </div>
-              <div>
-                <strong>Backend:</strong><br>
-                Node.js + Express + SQLite<br>
-                Claude AI + Analyse locale
-              </div>
-              <div>
-                <strong>Coûts:</strong><br>
-                Local: ~0.00001€<br>
-                IA: ~0.002€<br>
-                Hybride: Optimisé
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+    </div>
+    
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useFormStore } from '../stores/formStore.js'
+import { useProfileStore } from '../stores/profileStore.js'
 
-// Components
-import ProgressBar from '../components/ProgressBar.vue'
-import FormulairePrincipal from '../components/FormulairePrincipal.vue'
-import CostDisplay from '../components/CostDisplay.vue'
+// Router  
+const router = useRouter()
 
-// Icons (simple inline components for demo)
-const LocalIcon = {
-  template: '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg>'
-}
-
-const AIIcon = {
-  template: '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path></svg>'
-}
-
-const HybridIcon = {
-  template: '<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>'
-}
+// Stores
+const formStore = useFormStore()
 
 // State
-const formStore = useFormStore()
-const showModeInfo = ref(true)
-const showTechDetails = ref(false)
-const isDevelopment = ref(import.meta.env.DEV)
+const userInput = ref('')
 
-// Computed
-const modeIcon = computed(() => {
-  switch (formStore.detectionMode) {
-    case 'local': return LocalIcon
-    case 'ai': return AIIcon
-    case 'hybrid': return HybridIcon
-    default: return HybridIcon
+// Exemples d'activités (inspirés de ux-demo.html)
+const examples = [
+  {
+    key: 'consultant',
+    icon: '👔',
+    label: 'Consultant IT multi-clients',
+    text: "Je suis consultant IT spécialisé en transformation digitale. Je gère simultanément 3-4 projets clients avec des équipes techniques mixtes. Entre les phases d'analyse, de configuration système et le support utilisateur, j'ai besoin d'une organisation claire par client."
+  },
+  {
+    key: 'manager',
+    icon: '👥', 
+    label: 'Manager équipe produit',
+    text: "Je manage une équipe produit de 8 personnes sur plusieurs fonctionnalités. Nous travaillons en cycles de 2 semaines avec des sprints définis. Je dois coordonner le développement, les tests et les déploiements tout en gardant une vue d'ensemble des priorités."
+  },
+  {
+    key: 'freelance',
+    icon: '💻',
+    label: 'Freelance projets web', 
+    text: "Développeur web freelance, je jongle entre plusieurs projets clients simultanément. Sites e-commerce, applications mobiles, maintenance... Chaque projet a ses propres échéances et je dois optimiser mon temps entre développement, relation client et prospection."
+  },
+  {
+    key: 'startup',
+    icon: '🚀',
+    label: 'Fondateur startup',
+    text: "Fondateur d'une startup en phase de croissance. Je dois gérer le développement produit, le marketing, les ventes et l'équipe. Entre les features à prioriser, les bugs à corriger et la stratégie business, j'ai besoin d'une vue globale organisée."
   }
-})
-
-const modeInfo = computed(() => {
-  const modes = {
-    local: {
-      title: 'Mode Local - Analyse Gratuite',
-      description: 'Utilise une base de 200+ mots-clés pondérés pour détecter le contexte organisationnel.',
-      speed: 'Ultra-rapide (< 50ms)',
-      cost: 'Gratuit (~0.00001€)',
-      accuracy: 'Bonne (70-85%)'
-    },
-    ai: {
-      title: 'Mode IA - Analyse Précise',
-      description: 'Utilise Claude AI pour une analyse contextuelle approfondie et nuancée.',
-      speed: 'Modéré (500-2000ms)',
-      cost: 'Payant (~0.002€)',
-      accuracy: 'Excellente (85-95%)'
-    },
-    hybrid: {
-      title: 'Mode Hybride - Optimal',
-      description: 'Combine analyse locale et IA intelligemment pour optimiser précision/coût.',
-      speed: 'Adaptatif (50-2000ms)',
-      cost: 'Variable (optimisé)',
-      accuracy: 'Optimale (80-95%)'
-    }
-  }
-  
-  return modes[formStore.detectionMode] || modes.hybrid
-})
+]
 
 // Methods
-const onModeChange = () => {
-  showModeInfo.value = true
+const onInputChange = () => {
+  // Mise à jour en temps réel du store
+  formStore.userInput = userInput.value
+}
+
+const setExample = (exampleText) => {
+  userInput.value = exampleText
+  formStore.userInput = exampleText
+}
+
+const startAnalysis = () => {
+  if (userInput.value.length < 10) return
   
-  // Reset form si changement significatif
-  if (formStore.currentStep > 1) {
-    const confirmed = confirm('Changer de mode va réinitialiser votre progression. Continuer ?')
-    if (confirmed) {
-      formStore.resetForm()
-    } else {
-      // Revert to previous mode (would need to track this)
-      return
-    }
+  // Réinitialiser le store
+  formStore.resetForm()
+  formStore.userInput = userInput.value
+  
+  // Naviguer vers le formulaire d'analyse
+  router.push('/welcome-guided')
+}
+
+// Lifecycle - Simplifié pour la nouvelle interface
+onMounted(() => {
+  // Réinitialiser le formulaire au chargement de la page d'accueil
+  formStore.resetForm()
+})
+</script>
+
+<style scoped>
+/* === INDX FLOW HOMEPAGE STYLES v2.2 === */
+/* Updated: 2025-01-06 18:00 - Hot reload optimisé + Turbo mode */
+
+/* Gradient background identique à ux-demo.html */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+/* Effet card hover pour les exemples */
+.example-tag {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.example-tag:hover {
+  background-color: #4f46e5 !important;
+  color: white !important;
+  transform: translateY(-1px);
+}
+
+/* Animation de la card principale */
+.card-main {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// Lifecycle
-onMounted(() => {
-  // Auto-hide mode info after 5 seconds
-  setTimeout(() => {
-    showModeInfo.value = false
-  }, 5000)
-})
+/* Effet focus amélioré pour le textarea */
+textarea:focus {
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
 
-// Watch for form reset
-watch(() => formStore.currentStep, (newStep) => {
-  if (newStep === 1) {
-    showModeInfo.value = true
+/* Bouton principal avec effet gradient */
+.btn-gradient {
+  background: linear-gradient(45deg, #4f46e5, #7c3aed);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover:not(:disabled) {
+  background: linear-gradient(45deg, #4338ca, #6d28d9);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+}
+
+.btn-gradient:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Bouton header avec effet glassmorphism */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Footer minimaliste */
+footer {
+  backdrop-filter: blur(10px);
+  z-index: 5;
+}
+
+/* Corrections layout pour centrage parfait */
+.gradient-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-container {
+  max-width: 48rem; /* max-w-2xl */
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 1;
+  position: relative;
+}
+
+/* Effet de pulsation pour le bouton principal quand actif */
+.btn-gradient.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
   }
-})
-</script>
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+/* Amélioration de l'accessibilité */
+.btn-gradient:focus,
+.example-tag:focus,
+.btn-glass:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .main-container {
+    padding: 1rem;
+  }
+  
+  .card-main {
+    padding: 1.5rem;
+    margin: 0;
+  }
+  
+  .btn-gradient {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+  
+  .example-tag {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  header {
+    padding: 1rem 0;
+  }
+  
+  footer {
+    position: fixed;
+  }
+}
+</style>

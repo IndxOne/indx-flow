@@ -30,22 +30,55 @@
 
     <!-- Generated Structure Preview -->
     <div class="card bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">
-        📋 Structure générée
-      </h3>
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">
+          📋 Structure générée
+        </h3>
+        <div v-if="structureMetadata" class="text-right">
+          <div class="text-sm text-indigo-600 font-medium">{{ structureMetadata.type }}</div>
+          <div class="text-xs text-gray-500">{{ structureMetadata.description }}</div>
+        </div>
+      </div>
       
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div 
-          v-for="(column, index) in currentStructure" 
-          :key="index"
+          v-for="(column, index) in specializedColumns" 
+          :key="column.id || index"
           class="bg-white rounded-lg p-4 border-2 border-gray-200 hover:border-indigo-300 transition-colors"
+          :class="getColumnColorClass(column.color)"
         >
           <div class="text-center">
-            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <span class="text-indigo-600 font-bold">{{ index + 1 }}</span>
+            <div class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2"
+                 :class="getColumnIconClass(column.color)">
+              <span class="font-bold">{{ index + 1 }}</span>
             </div>
-            <h4 class="font-medium text-gray-900 mb-1">{{ column }}</h4>
-            <p class="text-xs text-gray-500">Colonne {{ index + 1 }}</p>
+            <h4 class="font-medium text-gray-900 mb-1">{{ column.name }}</h4>
+            <p class="text-xs text-gray-500">{{ column.description || `Colonne ${index + 1}` }}</p>
+            
+            <!-- Nombre de tâches par défaut -->
+            <div v-if="column.defaultTasks?.length" class="mt-2">
+              <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                {{ column.defaultTasks.length }} tâche{{ column.defaultTasks.length > 1 ? 's' : '' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métadonnées structure spécialisée -->
+      <div v-if="structureMetadata && structureMetadata.estimatedDuration" class="border-t pt-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500">⏱️ Durée estimée :</span>
+            <span class="font-medium text-gray-900">{{ structureMetadata.estimatedDuration }}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500">🎯 Contextes :</span>
+            <span class="font-medium text-gray-900">{{ structureMetadata.contexts?.join(', ') }}</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500">📊 Type :</span>
+            <span class="font-medium text-gray-900">{{ formatStructureType(structureMetadata.type) }}</span>
           </div>
         </div>
       </div>
@@ -182,7 +215,15 @@ const getContextBadgeClass = (contextType) => {
 }
 
 const currentStructure = computed(() => {
-  return formStore.structurePreview || getDefaultStructure()
+  return formStore.structurePreview?.columns?.map(col => col.name) || getDefaultStructure()
+})
+
+const specializedColumns = computed(() => {
+  return formStore.structurePreview?.columns || []
+})
+
+const structureMetadata = computed(() => {
+  return formStore.getStructureMetadata()
 })
 
 const usageTips = computed(() => {
@@ -370,21 +411,73 @@ const getColumnsForContext = (contextType) => {
   return defaults[contextType] || ['Colonne 1', 'Colonne 2', 'Colonne 3', 'Colonne 4']
 }
 
+const getColumnColorClass = (color) => {
+  const colorClasses = {
+    red: 'hover:border-red-300 hover:bg-red-50',
+    blue: 'hover:border-blue-300 hover:bg-blue-50',
+    green: 'hover:border-green-300 hover:bg-green-50',
+    yellow: 'hover:border-yellow-300 hover:bg-yellow-50',
+    purple: 'hover:border-purple-300 hover:bg-purple-50',
+    amber: 'hover:border-amber-300 hover:bg-amber-50',
+    emerald: 'hover:border-emerald-300 hover:bg-emerald-50',
+    cyan: 'hover:border-cyan-300 hover:bg-cyan-50',
+    indigo: 'hover:border-indigo-300 hover:bg-indigo-50',
+    violet: 'hover:border-violet-300 hover:bg-violet-50',
+    gray: 'hover:border-gray-300 hover:bg-gray-50'
+  }
+  return colorClasses[color] || 'hover:border-indigo-300 hover:bg-indigo-50'
+}
+
+const getColumnIconClass = (color) => {
+  const iconClasses = {
+    red: 'bg-red-100 text-red-600',
+    blue: 'bg-blue-100 text-blue-600',
+    green: 'bg-green-100 text-green-600',
+    yellow: 'bg-yellow-100 text-yellow-600',
+    purple: 'bg-purple-100 text-purple-600',
+    amber: 'bg-amber-100 text-amber-600',
+    emerald: 'bg-emerald-100 text-emerald-600',
+    cyan: 'bg-cyan-100 text-cyan-600',
+    indigo: 'bg-indigo-100 text-indigo-600',
+    violet: 'bg-violet-100 text-violet-600',
+    gray: 'bg-gray-100 text-gray-600'
+  }
+  return iconClasses[color] || 'bg-indigo-100 text-indigo-600'
+}
+
+const formatStructureType = (type) => {
+  const typeFormats = {
+    'INTEGRATION_SYSTEMES': 'Intégration Systèmes',
+    'MAINTENANCE_TICKETING': 'Maintenance & Ticketing',
+    'SUPPORT_PROGRAMME': 'Support Programmé',
+    'DEVELOPPEMENT_OUTILS': 'Développement Outils',
+    'GESTION_PROJET': 'Gestion de Projet',
+    'CONSULTANT_SI': 'Consultant SI',
+    'CLIENT_BASED': 'Organisation par Clients',
+    'TEMPORAL': 'Organisation Temporelle',
+    'PHASED': 'Organisation par Phases',
+    'VERSIONED': 'Organisation par Versions',
+    'PROCESS_BASED': 'Organisation par Processus',
+    'RESOURCE_BASED': 'Organisation par Ressources',
+    'DEFAULT': 'Structure Standard'
+  }
+  return typeFormats[type] || type
+}
+
 const regenerateStructure = async () => {
   isRegenerating.value = true
   
   try {
-    const response = await contextApi.generateStructure(
-      formStore.detectedContext,
-      formStore.adaptiveAnswers
-    )
+    // Utiliser la nouvelle génération spécialisée
+    const result = formStore.generateSpecializedStructure()
     
-    if (response.success) {
-      formStore.setStructurePreview(response.structure)
+    if (result.success) {
       resetToDefault()
+    } else {
+      console.warn('⚠️ [STRUCTURE-PREVIEW] Fallback sur structure par défaut:', result.error)
     }
   } catch (error) {
-    console.error('Erreur régénération:', error)
+    console.error('❌ [STRUCTURE-PREVIEW] Erreur régénération:', error)
   } finally {
     isRegenerating.value = false
   }
@@ -401,10 +494,25 @@ const handleNext = () => {
   )
   
   if (hasCustomizations) {
-    const finalStructure = editableStructure.value.map((col, index) => 
-      col.trim() || currentStructure.value[index]
-    )
-    formStore.setStructurePreview(finalStructure)
+    // Préserver les métadonnées existantes tout en appliquant les personnalisations
+    const currentPreview = formStore.structurePreview
+    const updatedStructure = {
+      ...currentPreview,
+      columns: currentPreview.columns.map((column, index) => ({
+        ...column,
+        name: editableStructure.value[index].trim() || column.name
+      })),
+      customizedAt: new Date().toISOString(),
+      userCustomized: true
+    }
+    
+    console.log('✏️ [STRUCTURE-PREVIEW] Personnalisation appliquée:', {
+      hasCustomizations,
+      editableStructure: editableStructure.value,
+      updatedStructure
+    })
+    
+    formStore.setStructurePreview(updatedStructure)
   }
   
   emit('next')
@@ -412,9 +520,27 @@ const handleNext = () => {
 
 // Lifecycle
 onMounted(() => {
-  // Générer la structure si pas encore fait
-  if (!formStore.structurePreview) {
-    formStore.setStructurePreview(getDefaultStructure())
+  // Générer la structure spécialisée si pas encore fait
+  if (!formStore.structurePreview || !formStore.structurePreview.columns) {
+    console.log('🏗️ [STRUCTURE-PREVIEW] Génération structure spécialisée au montage')
+    const result = formStore.generateSpecializedStructure()
+    
+    if (!result.success) {
+      console.warn('⚠️ [STRUCTURE-PREVIEW] Fallback structure par défaut:', result.error)
+      formStore.setStructurePreview({
+        columns: getDefaultStructure().map((name, index) => ({
+          id: `col-${index}`,
+          name,
+          description: `Colonne ${index + 1}`,
+          color: 'blue',
+          defaultTasks: []
+        })),
+        metadata: {
+          type: 'DEFAULT',
+          description: 'Structure générique par défaut'
+        }
+      })
+    }
   }
   
   resetToDefault()

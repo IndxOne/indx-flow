@@ -193,7 +193,7 @@ export class SupabaseService {
     try {
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, description, created_at, updated_at')
+        .select('id, name, description, columns, project_type, analysis_id, created_at, updated_at')
         .eq('user_email', userEmail)
         .eq('is_active', true)
         .order('updated_at', { ascending: false })
@@ -204,6 +204,87 @@ export class SupabaseService {
     } catch (error) {
       console.error('❌ [SUPABASE] Erreur liste workspaces:', error)
       return { success: false, data: [] }
+    }
+  }
+
+  /**
+   * Mettre à jour un workspace existant
+   */
+  async updateWorkspace(workspaceId, updates) {
+    if (!this.isEnabled) return { success: false, data: null }
+
+    try {
+      // Colonnes autorisées dans le schéma workspaces
+      const allowedColumns = [
+        'analysis_id',
+        'name', 
+        'description',
+        'columns',
+        'project_type',
+        'user_email'
+      ]
+
+      // Filtrer pour ne garder que les colonnes autorisées
+      const safeUpdates = {}
+      for (const [key, value] of Object.entries(updates)) {
+        if (allowedColumns.includes(key)) {
+          safeUpdates[key] = value
+        } else {
+          console.warn(`⚠️ [SUPABASE] Colonne '${key}' ignorée (non autorisée dans le schéma)`)
+        }
+      }
+
+      // Ajouter updated_at automatiquement
+      safeUpdates.updated_at = new Date().toISOString()
+
+      console.log('📝 [SUPABASE] Updates sécurisés:', safeUpdates)
+
+      const { data, error } = await supabase
+        .from('workspaces')
+        .update(safeUpdates)
+        .eq('id', workspaceId)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      console.log('✅ [SUPABASE] Workspace mis à jour:', workspaceId)
+      return { success: true, data }
+    } catch (error) {
+      console.error('❌ [SUPABASE] Erreur mise à jour workspace:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
+  /**
+   * Mettre à jour spécifiquement les colonnes d'un workspace
+   */
+  async updateWorkspaceColumns(workspaceId, columns, userEmail = null) {
+    if (!this.isEnabled) return { success: false, data: null }
+
+    try {
+      // Validation optionnelle par email utilisateur
+      const query = supabase
+        .from('workspaces')
+        .update({
+          columns: columns,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', workspaceId)
+
+      if (userEmail) {
+        query.eq('user_email', userEmail)
+      }
+
+      const { data, error } = await query.select().single()
+
+      if (error) throw error
+
+      console.log('✅ [SUPABASE] Colonnes workspace mises à jour:', workspaceId, columns)
+      return { success: true, data }
+    } catch (error) {
+      console.error('❌ [SUPABASE] Erreur mise à jour colonnes workspace:', error)
+      return { success: false, error: error.message }
     }
   }
 

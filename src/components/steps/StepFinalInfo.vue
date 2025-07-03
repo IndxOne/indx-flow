@@ -190,13 +190,36 @@ const formStore = useFormStore()
 
 // State
 const userInfo = ref({
-  email: formStore.userInfo.email || '',
+  email: formStore.userInfo.email || loadEmailFromLocalStorage() || '',
   sector: formStore.userInfo.sector || '',
   companySize: formStore.userInfo.companySize || '',
   newsletter: formStore.userInfo.newsletter || false
 })
 
 const emailError = ref('')
+
+// Persistence helpers - même clé que WorkspacesList pour cohérence
+const STORAGE_KEY = 'indx_user_email'
+
+const saveEmailToLocalStorage = (email) => {
+  try {
+    if (email && email.includes('@')) {
+      localStorage.setItem(STORAGE_KEY, email)
+      console.log('💾 [FINAL-INFO] Email sauvegardé dans localStorage:', email)
+    }
+  } catch (error) {
+    console.warn('❌ [FINAL-INFO] Erreur sauvegarde localStorage:', error)
+  }
+}
+
+const loadEmailFromLocalStorage = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEY) || ''
+  } catch (error) {
+    console.warn('❌ [FINAL-INFO] Erreur lecture localStorage:', error)
+    return ''
+  }
+}
 
 // Data
 const sectors = ref([
@@ -289,6 +312,10 @@ const handleNext = () => {
   if (canProceed.value) {
     // Sauvegarder les informations dans le store
     formStore.updateUserInfo(userInfo.value)
+    
+    // PERSISTENCE: Sauvegarder l'email dans localStorage pour récupération future
+    saveEmailToLocalStorage(userInfo.value.email)
+    
     emit('next')
   }
 }
@@ -298,10 +325,14 @@ watch(userInfo, (newInfo) => {
   formStore.updateUserInfo(newInfo)
 }, { deep: true })
 
-// Auto-validate email on input
-watch(() => userInfo.value.email, () => {
-  if (userInfo.value.email) {
+// Auto-validate email on input + persistence
+watch(() => userInfo.value.email, (newEmail) => {
+  if (newEmail) {
     validateEmail()
+    // Sauvegarder immédiatement l'email dès qu'il est valide
+    if (!emailError.value && newEmail.includes('@')) {
+      saveEmailToLocalStorage(newEmail)
+    }
   } else {
     emailError.value = ''
   }

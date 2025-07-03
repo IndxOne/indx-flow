@@ -2,6 +2,62 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🌐 **PRIORITÉ 1 - LANGUE ET COMMUNICATION**
+
+**Préférer les réponses en Français et en anglais si obligé selon contexte**
+
+- **Français par défaut** : Toutes les interactions, explications et communications doivent être prioritairement en français
+- **Anglais si nécessaire** : Utiliser l'anglais uniquement pour le code, la documentation technique spécialisée, ou si le contexte l'exige explicitement  
+- **Code et comments** : Les commentaires dans le code peuvent rester en anglais pour la compatibilité technique
+- **Variables et fonctions** : Noms en anglais pour respecter les conventions de développement
+- **Documentation utilisateur** : Toujours en français pour l'accessibilité
+
+---
+
+## 🏗️ **PRIORITÉ 1 - PRINCIPES DE DÉVELOPPEMENT OBLIGATOIRES**
+
+**Respecter ABSOLUMENT ces principes pour toute modification de code dans ce projet :**
+
+### **1. 🎯 Separation of Concerns (SoC)**
+- **Responsabilité unique** : Chaque composant/fonction a une seule responsabilité
+- **Découplage** : UI séparée de la logique métier, store séparé des composants
+- **Organisation claire** : `/components`, `/stores`, `/services`, `/utils` avec rôles définis
+
+### **2. 🔄 Don't Repeat Yourself (DRY)**
+- **Factorisation** : Pas de code dupliqué, créer des composables/utilitaires réutilisables
+- **Composants génériques** : Réutiliser avant de recréer
+- **Configuration centralisée** : Constants, types, et configurations dans des fichiers dédiés
+
+### **3. 💎 Keep it Simple, Stupid (KISS)**
+- **Simplicité d'abord** : Solution la plus simple qui fonctionne
+- **Pas de sur-ingénierie** : Éviter la complexité inutile
+- **Lisibilité** : Code compréhensible par tous les développeurs
+
+### **4. 📚 Document Your Code**
+- **Commentaires utiles** : Expliquer le "pourquoi", pas le "comment"
+- **Types TypeScript** : Documentation vivante via typage strict
+- **JSDoc** : Pour les fonctions complexes et les APIs
+
+### **5. 🧪 Test-Driven Development (TDD)**
+- **Tests d'abord** : Écrire les tests avant le code si possible
+- **Couverture** : Tester les cas d'usage principaux et les edge cases
+- **Tests unitaires** : Pour la logique métier et les composables
+
+### **6. ⚡ You Ain't Gonna Need It (YAGNI)**
+- **Besoins actuels** : Développer uniquement ce qui est requis maintenant
+- **Pas d'anticipation** : Ne pas coder pour des besoins futurs hypothétiques
+- **Itération** : Ajouter les fonctionnalités quand elles sont vraiment nécessaires
+
+### **🚨 AVANT CHAQUE MODIFICATION DE CODE :**
+1. **SoC** : Cette modification respecte-t-elle la séparation des responsabilités ?
+2. **DRY** : Y a-t-il du code existant que je peux réutiliser ?
+3. **KISS** : Puis-je faire plus simple ?
+4. **DOC** : Ai-je documenté les parties complexes ?
+5. **TDD** : Ai-je pensé aux tests pour cette fonctionnalité ?
+6. **YAGNI** : Cette fonctionnalité est-elle vraiment nécessaire maintenant ?
+
+---
+
 # PRD - Application de Détection Contextuelle Intelligente
 
 ## 🎯 RÉSUMÉ EXÉCUTIF
